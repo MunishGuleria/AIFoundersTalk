@@ -1,4 +1,4 @@
-﻿import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getAllContent, getTrendingItems, getTrendingCount } from "@/lib/content";
 import { PillarKey } from "@/lib/taxonomy";
 
@@ -10,11 +10,9 @@ export async function GET(request: NextRequest) {
 
     if (type === "trending") {
       const sourceParam = searchParams.get("source");
-      let mappedSource: "all" | "Hacker News" | "Product Hunt" = "all";
+      let mappedSource: "all" | "Hacker News" = "all";
       if (sourceParam === "hacker-news" || sourceParam === "Hacker News") {
         mappedSource = "Hacker News";
-      } else if (sourceParam === "product-hunt" || sourceParam === "Product Hunt") {
-        mappedSource = "Product Hunt";
       }
 
       const sortParam = searchParams.get("sort") === "recent" ? "recent" : "score";

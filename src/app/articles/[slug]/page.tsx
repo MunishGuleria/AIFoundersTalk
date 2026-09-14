@@ -1,3 +1,6 @@
+// ISR Revalidation: 24 hours for individual editorial detail pages
+export const revalidate = 86400;
+
 ﻿import React from "react";
 import { notFound } from "next/navigation";
 import Image from "next/image";
@@ -158,7 +161,7 @@ export default async function ArticlePage({
                   By <strong className="text-slate-900">{author.name}</strong>
                 </span>
               )}
-              <span>â€¢</span>
+              <span>•</span>
               <time dateTime={meta.publishedAt}>
                 Published {new Date(meta.publishedAt).toLocaleDateString("en-US", {
                   month: "short",
@@ -168,7 +171,7 @@ export default async function ArticlePage({
               </time>
               {meta.updatedAt && meta.updatedAt !== meta.publishedAt && (
                 <>
-                  <span>â€¢</span>
+                  <span>•</span>
                   <span className="text-slate-700">
                     Updated {new Date(meta.updatedAt).toLocaleDateString("en-US", {
                       month: "short",
@@ -178,7 +181,7 @@ export default async function ArticlePage({
                   </span>
                 </>
               )}
-              <span>â€¢</span>
+              <span>•</span>
               <span>{meta.readingTime}</span>
             </div>
 
@@ -292,7 +295,7 @@ export default async function ArticlePage({
                       className="text-blue-600 hover:text-blue-800 underline font-medium transition-colors"
                       data-track="outbound_resource_click"
                     >
-                      {cite.title} â†’
+                      {cite.title} →
                     </a>
                   </li>
                 ))}

@@ -2,7 +2,7 @@ import { ContentMeta } from "@/lib/content";
 import { getSiteUrl, absoluteUrl } from "@/lib/siteUrl";
 
 /**
- * Organization JSON-LD ? rendered once in root layout.
+ * Organization JSON-LD — rendered once in root layout.
  */
 export function OrganizationJsonLd() {
   const siteUrl = getSiteUrl();
@@ -29,7 +29,7 @@ export function OrganizationJsonLd() {
 }
 
 /**
- * Article JSON-LD ? rendered on individual article/interview/resource pages.
+ * Article JSON-LD — rendered on individual article/interview/resource pages.
  */
 export function ArticleJsonLd({
   article,
@@ -92,7 +92,7 @@ export function ArticleJsonLd({
 }
 
 /**
- * Breadcrumb JSON-LD ? rendered on all pages with navigation context.
+ * Breadcrumb JSON-LD — rendered on all pages with navigation context.
  */
 export function BreadcrumbJsonLd({
   items,
@@ -121,7 +121,7 @@ export function BreadcrumbJsonLd({
 }
 
 /**
- * FAQ JSON-LD ? rendered on resource/comparison pages with Q&A sections.
+ * FAQ JSON-LD — rendered on resource/comparison pages with Q&A sections.
  */
 export function FaqJsonLd({
   questions,

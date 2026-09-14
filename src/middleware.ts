@@ -3,25 +3,6 @@ import type { NextRequest } from "next/server";
 import { Redis } from "@upstash/redis";
 import { Ratelimit } from "@upstash/ratelimit";
 
-/**
- * ============================================================================
- * RATE LIMITING MIDDLEWARE (Upstash Redis + Sliding Window)
- * ============================================================================
- *
- * Why a Sliding-Window Rate Limiter?
- * ---------------------------------
- * A fixed-window limiter resets its counter at strict intervals (e.g., at the
- * start of every minute/hour). This creates a "burst-at-boundary" vulnerability
- * where an attacker can send maximum allowed requests at 00:59 and another full
- * batch at 01:00, effectively doubling the allowed rate in a 2-second span.
- *
- * The Sliding-Window algorithm smooths this boundary by evaluating a continuous
- * moving window over the elapsed time, ensuring that the defined rate limit is
- * strictly enforced across any arbitrary sub-window without traffic spikes.
- * ============================================================================
- */
-
-// Initialize Upstash Redis client if credentials are valid
 const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
 const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 
@@ -29,25 +10,16 @@ const isRedisConfigured = Boolean(
   redisUrl &&
   redisToken &&
   !redisUrl.includes("your-upstash-redis-url") &&
+  !redisUrl.includes("your_upstash") &&
   !redisUrl.includes("example") &&
-  !redisToken.includes("your-upstash-token")
+  !redisToken.includes("your-upstash-token") &&
+  !redisToken.includes("your_upstash")
 );
 
-const redis = isRedisConfigured
-  ? new Redis({
-      url: redisUrl!,
-      token: redisToken!,
-    })
-  : null;
+let loggedMissingWarning = false;
 
-// Configure sliding-window rate limiters per route
-const newsletterLimiter = redis
-  ? new Ratelimit({
-      redis,
-      limiter: Ratelimit.slidingWindow(5, "1 h"),
-      prefix: "ratelimit:newsletter",
-      analytics: true,
-    })
+const redis = isRedisConfigured
+  ? new Redis({ url: redisUrl!, token: redisToken! })
   : null;
 
 const searchLimiter = redis
@@ -55,40 +27,43 @@ const searchLimiter = redis
       redis,
       limiter: Ratelimit.slidingWindow(30, "1 m"),
       prefix: "ratelimit:search",
-      analytics: true,
+      analytics: false,
     })
   : null;
 
-const scrapeLimiter = redis
+const newsletterLimiter = redis
   ? new Ratelimit({
       redis,
-      limiter: Ratelimit.slidingWindow(10, "1 m"),
-      prefix: "ratelimit:scrape",
-      analytics: true,
+      limiter: Ratelimit.slidingWindow(5, "1 h"),
+      prefix: "ratelimit:newsletter",
+      analytics: false,
     })
   : null;
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Determine appropriate rate limiter based on path
   let limiter: Ratelimit | null = null;
-  if (pathname.startsWith("/api/newsletter")) {
-    limiter = newsletterLimiter;
-  } else if (pathname.startsWith("/api/search")) {
+  if (pathname.startsWith("/api/search")) {
     limiter = searchLimiter;
-  } else if (pathname.startsWith("/api/cron/scrape")) {
-    limiter = scrapeLimiter;
+  } else if (pathname.startsWith("/api/newsletter")) {
+    limiter = newsletterLimiter;
   }
 
-  // If no limiter matches or Redis is not configured (e.g. local dev without keys), allow request
-  if (!limiter) {
+  if (limiter === null && !pathname.startsWith("/api/search") && !pathname.startsWith("/api/newsletter")) {
     return NextResponse.next();
   }
 
-  // Extract client IP (Vercel edge x-forwarded-for or fallback)
+  if (!redis || !limiter) {
+    if (!loggedMissingWarning) {
+      console.warn("[ratelimit] Upstash Redis credentials not configured. Rate limiting is bypassed in fail-open mode.");
+      loggedMissingWarning = true;
+    }
+    return NextResponse.next();
+  }
+
   const forwardedFor = request.headers.get("x-forwarded-for");
-  const ip = forwardedFor ? forwardedFor.split(",")[0].trim() : "127.0.0.1";
+  const ip = forwardedFor ? forwardedFor.split(",")[0].trim() : "unknown-ip";
 
   try {
     const { success, limit, remaining, reset } = await limiter.limit(ip);
@@ -103,7 +78,7 @@ export async function middleware(request: NextRequest) {
             "X-RateLimit-Limit": limit.toString(),
             "X-RateLimit-Remaining": remaining.toString(),
             "X-RateLimit-Reset": reset.toString(),
-            "Retry-After": Math.ceil((reset - Date.now()) / 1000).toString(),
+            "Retry-After": Math.max(1, Math.ceil((reset - Date.now()) / 1000)).toString(),
           },
         }
       );
@@ -115,19 +90,19 @@ export async function middleware(request: NextRequest) {
     response.headers.set("X-RateLimit-Reset", reset.toString());
     return response;
   } catch (error) {
-    console.error("[ratelimit] Redis connection error:", error);
-    // Fail open gracefully so unexpected Redis downtime does not break critical traffic
+    console.warn(
+      "[ratelimit] Upstash Redis connection error - failing open for request:",
+      error instanceof Error ? error.message : "Unknown error"
+    );
     return NextResponse.next();
   }
 }
 
 export const config = {
   matcher: [
-    "/api/newsletter/:path*",
-    "/api/newsletter",
     "/api/search/:path*",
     "/api/search",
-    "/api/cron/scrape/:path*",
-    "/api/cron/scrape",
+    "/api/newsletter/:path*",
+    "/api/newsletter",
   ],
 };

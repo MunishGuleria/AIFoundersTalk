@@ -1,3 +1,6 @@
+// ISR Revalidation: 24 hours for individual editorial detail pages
+export const revalidate = 86400;
+
 ﻿import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";

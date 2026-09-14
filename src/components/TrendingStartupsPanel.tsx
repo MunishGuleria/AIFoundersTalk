@@ -18,11 +18,9 @@ export function TrendingStartupsPanel({
   previewLimit = 6,
   showAllLink = true,
 }: TrendingStartupsPanelProps) {
-  const [selectedSource, setSelectedSource] = useState<"All" | "Hacker News" | "Product Hunt">("All");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [sortBy, setSortBy] = useState<"score" | "recent">("score");
 
-  // Extract unique categories from items
   const categories = useMemo(() => {
     const set = new Set<string>();
     initialItems.forEach((item) => {
@@ -31,13 +29,8 @@ export function TrendingStartupsPanel({
     return ["All", ...Array.from(set)];
   }, [initialItems]);
 
-  // Filter and sort items
   const filteredItems = useMemo(() => {
     let result = [...initialItems];
-
-    if (selectedSource !== "All") {
-      result = result.filter((item) => item.source === selectedSource);
-    }
 
     if (selectedCategory !== "All") {
       result = result.filter((item) => item.category === selectedCategory);
@@ -57,7 +50,7 @@ export function TrendingStartupsPanel({
     }
 
     return result;
-  }, [initialItems, selectedSource, selectedCategory, sortBy, isCompactPreview, previewLimit]);
+  }, [initialItems, selectedCategory, sortBy, isCompactPreview, previewLimit]);
 
   return (
     <section className={isCompactPreview ? "my-0" : "my-14"} id="trending-startups-panel">
@@ -68,12 +61,12 @@ export function TrendingStartupsPanel({
             className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight"
             style={{ fontFamily: "var(--font-serif)" }}
           >
-            {isCompactPreview ? "Trending" : "Trending AI Discussions & Product Launches"}
+            {isCompactPreview ? "Trending Discussions" : "Trending AI Discussions"}
           </h2>
           <p className="text-sm text-slate-600 mt-1 max-w-2xl font-sans">
             {isCompactPreview
-              ? "Hacker News and Product Hunt stories worth watching."
-              : "Real-time pulse of breakout AI tools, developer discussions, and founder launches. Curated by AI Founders Talk from official Hacker News & Product Hunt APIs."}
+              ? "Top AI and founder discussions from Hacker News worth watching."
+              : "Real-time pulse of developer discussions and AI tool mentions curated from the official Hacker News Algolia API."}
           </p>
         </div>
 
@@ -96,41 +89,22 @@ export function TrendingStartupsPanel({
         </div>
       </div>
 
-      {/* Filter Bar — clean black/white/blue styling */}
-      <div className="flex flex-wrap items-center gap-3 p-4 bg-slate-50 border border-slate-200 rounded-xl mb-8">
-        {/* Source Filter */}
-        <div className="flex items-center gap-1.5 border-r border-slate-200 pr-4 mr-2">
-          {(["All", "Hacker News", "Product Hunt"] as const).map((source) => (
-            <button
-              key={source}
-              onClick={() => setSelectedSource(source)}
-              className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                selectedSource === source
-                  ? "bg-slate-900 !text-white"
-                  : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-100"
-              }`}
-            >
-              {source === "All" ? "All Sources" : source}
-            </button>
-          ))}
-        </div>
-
-        {/* Category Pills */}
-        <div className="flex flex-wrap items-center gap-1.5 flex-1">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`text-xs px-2.5 py-1 rounded-md transition-all cursor-pointer ${
-                selectedCategory === cat
-                  ? "bg-slate-800 !text-white font-semibold"
-                  : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-100"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
+      {/* Category Pills Bar */}
+      <div className="flex flex-wrap items-center gap-2 p-4 bg-slate-50 border border-slate-200 rounded-xl mb-8">
+        <span className="text-xs font-semibold text-slate-500 mr-1">Topics:</span>
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            onClick={() => setSelectedCategory(cat)}
+            className={`text-xs px-3 py-1.5 rounded-md transition-all cursor-pointer ${
+              selectedCategory === cat
+                ? "bg-slate-900 !text-white font-semibold"
+                : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-100"
+            }`}
+          >
+            {cat}
+          </button>
+        ))}
       </div>
 
       {/* Grid of Trending Items */}
@@ -138,9 +112,7 @@ export function TrendingStartupsPanel({
         <div className="p-12 text-center bg-white rounded-xl border border-slate-200 shadow-2xs">
           <p className="text-slate-700 text-sm font-semibold mb-1">No trending items match your current filter.</p>
           <p className="text-slate-500 text-xs max-w-md mx-auto">
-            {selectedSource === "Product Hunt"
-              ? "Product Hunt records are synced automatically via the server-side cron pipeline when PRODUCT_HUNT_TOKEN is configured."
-              : "Try switching to 'All Sources' or choosing a different category filter above."}
+            Try choosing a different topic filter above.
           </p>
         </div>
       ) : (
@@ -158,7 +130,7 @@ export function TrendingStartupsPanel({
             href="/trending"
             className="btn-secondary text-xs sm:text-sm px-6 py-3 font-semibold no-underline inline-flex items-center gap-1.5"
           >
-            View all trending →
+            View all trending &rarr;
           </Link>
         </div>
       )}

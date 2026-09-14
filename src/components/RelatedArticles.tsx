@@ -40,6 +40,7 @@ export function RelatedArticles({
                       src={item.coverImage}
                       alt={item.coverImageAlt || `${item.title} - Related Analysis`}
                       fill
+                      sizes="64px"
                       className="object-cover group-hover:scale-105 transition-transform duration-200"
                     />
                   </div>

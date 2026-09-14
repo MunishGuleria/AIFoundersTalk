@@ -64,9 +64,9 @@ export function ShareButtons({ title, excerpt = "", slug, path, url }: ShareButt
     }
 
     if (copySucceeded) {
-      setLinkedInNotice("Post copied â€” paste it into LinkedIn");
+      setLinkedInNotice("Post copied — paste it into LinkedIn");
     } else {
-      setLinkedInNotice("LinkedIn opened â€” paste your post manually");
+      setLinkedInNotice("LinkedIn opened — paste your post manually");
     }
 
     setTimeout(() => {

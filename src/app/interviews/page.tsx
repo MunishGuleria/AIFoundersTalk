@@ -1,3 +1,6 @@
+// ISR Revalidation: 1 hour for aggregation & listing pages
+export const revalidate = 3600;
+
 ﻿import { getAllContent } from "@/lib/content";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";

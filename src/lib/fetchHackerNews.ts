@@ -1,11 +1,11 @@
 /**
  * Fetch top AI founder & startup discussions from Hacker News via the free official Algolia HN API.
  * Endpoint: https://hn.algolia.com/api/v1/search
- * Free public API — No API key required.
+ * Free public API - No API key required.
  */
 
 export interface TrendingItem {
-  source: "Hacker News" | "Product Hunt";
+  source: "Hacker News";
   external_id: string;
   name: string;
   url: string;
@@ -16,8 +16,7 @@ export interface TrendingItem {
 }
 
 /**
- * Note: Hacker News does not supply native category taxonomy fields.
- * This keyword-based inference provides an approximate thematic category for filtering.
+ * Keyword-based inference provides a thematic category for filtering.
  */
 export function inferHNCategory(title: string): string {
   const t = title.toLowerCase();

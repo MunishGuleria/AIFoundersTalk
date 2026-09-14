@@ -3,7 +3,7 @@ import path from "path";
 import matter from "gray-matter";
 import readingTime from "reading-time";
 import { PillarKey } from "./taxonomy";
-import { getOrSetCache } from "./cache";
+import { fetchHackerNewsTrending, type TrendingItem } from "./fetchHackerNews";
 
 export type ImageSourceType =
   | "original"
@@ -27,7 +27,6 @@ export interface Citation {
   supportedClaims?: string[];
 }
 
-// ─── Types ───────────────────────────────────────────────────────────────────
 export interface ContentMeta {
   title: string;
   slug: string;
@@ -52,107 +51,87 @@ export interface ContentMeta {
 
 export interface ContentItem {
   meta: ContentMeta;
-  content: string; // raw MDX string
+  content: string;
 }
 
-export interface ScrapedItem {
-  id: number;
-  title: string;
-  url: string;
-  source_name: string;
-  summary: string;
-  pillar: PillarKey;
-  tags: string[];
-  published_at: string;
-  scraped_at: string;
-  is_published: boolean;
-}
-
-// Quality gate thresholds
 const MIN_WORD_COUNT = 800;
 const MIN_CITATIONS = 1;
 
-// ─── Content directories ─────────────────────────────────────────────────────
 const CONTENT_DIR = path.join(process.cwd(), "content");
 
 function getContentDir(type: "articles" | "interviews" | "resources") {
   return path.join(CONTENT_DIR, type);
 }
 
-// ─── Core loaders ────────────────────────────────────────────────────────────
-
-/**
- * Get a single content item by type and slug.
- * Parses frontmatter, validates quality gates, computes reading time.
- */
 export function getContentBySlug(
   type: "articles" | "interviews" | "resources",
   slug: string
 ): ContentItem | null {
   const dir = getContentDir(type);
-  const filePath = path.join(dir, `${slug}.mdx`);
+  const filePath = path.join(dir, slug + ".mdx");
 
   if (!fs.existsSync(filePath)) {
     return null;
   }
 
-  const fileContent = fs.readFileSync(filePath, "utf-8");
-  const { data, content } = matter(fileContent);
+  const fileContents = fs.readFileSync(filePath, "utf8");
+  const { data, content } = matter(fileContents);
+
   const stats = readingTime(content);
   const wordCount = stats.words;
+  const readingTimeStr = stats.text;
 
-  // Quality gate warnings (build-time only, don't block)
   if (wordCount < MIN_WORD_COUNT) {
     console.warn(
-      `[quality-gate] "${data.title}" (${type}/${slug}) has only ${wordCount} words (min: ${MIN_WORD_COUNT})`
+      "[Quality Gate Warning] " + slug + " has " + wordCount + " words (minimum: " + MIN_WORD_COUNT + ")"
     );
   }
-  const citations = data.citations || [];
+
+  const citations: Citation[] = data.citations || [];
   if (citations.length < MIN_CITATIONS) {
     console.warn(
-      `[quality-gate] "${data.title}" (${type}/${slug}) has ${citations.length} citations (min: ${MIN_CITATIONS})`
+      "[Quality Gate Warning] " + slug + " has " + citations.length + " citations (minimum: " + MIN_CITATIONS + ")"
     );
   }
 
-  const contentType = type === "articles" ? "article" : type === "interviews" ? "interview" : "resource";
-
-  const defaultAlt = `${data.title || "AI Founders Talk"} - Technical Architecture & Research Analysis`;
+  const singularType: "article" | "interview" | "resource" =
+    type === "articles"
+      ? "article"
+      : type === "interviews"
+      ? "interview"
+      : "resource";
 
   const meta: ContentMeta = {
     title: data.title || "Untitled",
-    slug: data.slug || slug,
-    pillar: data.pillar || "news-digest",
-    author: data.author || "editorial-team",
+    slug,
+    pillar: data.pillar,
+    author: data.author || "AI Founders Talk Editorial Team",
     publishedAt: data.publishedAt || new Date().toISOString().split("T")[0],
     updatedAt: data.updatedAt,
     excerpt: data.excerpt || "",
     coverImage: data.coverImage,
-    coverImageAlt: data.coverImageAlt || defaultAlt,
-    coverImageSource: (data.coverImageSource as ImageSourceType) || (data.imageCredit?.toLowerCase().includes("unsplash") ? "unsplash" : undefined),
+    coverImageAlt: data.coverImageAlt,
+    coverImageSource: data.coverImageSource,
     imageCredit: data.imageCredit,
     imageCreditUrl: data.imageCreditUrl,
     imageLicense: data.imageLicense,
     tags: data.tags || [],
     wordCount,
     citations,
-    featured: data.featured || false,
-    readingTime: stats.text,
-    type: contentType,
+    featured: Boolean(data.featured),
+    readingTime: readingTimeStr,
+    type: singularType,
   };
 
   return { meta, content };
 }
 
-/**
- * Get all content of a given type.
- * Optionally filter by pillar and/or sort.
- */
 export function getAllContent(
   type: "articles" | "interviews" | "resources",
   options?: {
     pillar?: PillarKey;
     featured?: boolean;
-    sortBy?: "publishedAt" | "title";
+    sortBy?: "publishedAt" | "readingTime";
     sortOrder?: "asc" | "desc";
     limit?: number;
   }
@@ -173,17 +152,14 @@ export function getAllContent(
     })
     .filter((item): item is ContentMeta => item !== null);
 
-  // Filter by pillar
   if (options?.pillar) {
     items = items.filter((item) => item.pillar === options.pillar);
   }
 
-  // Filter by featured
   if (options?.featured !== undefined) {
     items = items.filter((item) => item.featured === options.featured);
   }
 
-  // Sort
   const sortBy = options?.sortBy || "publishedAt";
   const sortOrder = options?.sortOrder || "desc";
   items.sort((a, b) => {
@@ -194,7 +170,6 @@ export function getAllContent(
     return 0;
   });
 
-  // Limit
   if (options?.limit) {
     items = items.slice(0, options.limit);
   }
@@ -202,9 +177,6 @@ export function getAllContent(
   return items;
 }
 
-/**
- * Get content across all types filtered by pillar.
- */
 export function getContentByPillar(pillar: PillarKey): ContentMeta[] {
   const types = ["articles", "interviews", "resources"] as const;
   const all = types.flatMap((type) => getAllContent(type, { pillar }));
@@ -216,9 +188,6 @@ export function getContentByPillar(pillar: PillarKey): ContentMeta[] {
   });
 }
 
-/**
- * Get all content across all types, sorted by date.
- */
 export function getAllContentMixed(options?: {
   limit?: number;
   featured?: boolean;
@@ -241,12 +210,8 @@ export function getAllContentMixed(options?: {
   return sorted;
 }
 
-/**
- * Get highly relevant related content based on category pillar, matching tags, and content type.
- */
 export function getRelatedContent(current: ContentMeta, limit: number = 4): ContentMeta[] {
   const all = getAllContentMixed().filter((item) => item.slug !== current.slug);
-  
   const currentTagsSet = new Set((current.tags || []).map((t) => t.toLowerCase()));
 
   const scored = all.map((item) => {
@@ -269,231 +234,65 @@ export function getRelatedContent(current: ContentMeta, limit: number = 4): Cont
   return scored.slice(0, limit).map((s) => s.item);
 }
 
-/**
- * Fetch published scraped items from database, with 15-minute server-side Redis caching.
- */
-export async function getScrapedItems(options?: {
-  pillar?: PillarKey;
-  limit?: number;
-}): Promise<ScrapedItem[]> {
-  const pillar = options?.pillar;
-  const limit = options?.limit || 20;
-  const cacheKey = `content:scraped:${pillar || "all"}:${limit}`;
-
-  return getOrSetCache(cacheKey, async () => {
-    if (!process.env.DATABASE_URL || process.env.DATABASE_URL.includes("example")) {
-      return [];
-    }
-
-    try {
-      const { neon } = await import("@neondatabase/serverless");
-      const sql = neon(process.env.DATABASE_URL);
-
-      let rows: unknown[];
-      if (pillar) {
-        rows = await sql`
-          SELECT * FROM scraped_items
-          WHERE is_published = TRUE AND summary IS NOT NULL AND summary != '' AND pillar = ${pillar}
-          ORDER BY scraped_at DESC
-          LIMIT ${limit}
-        `;
-      } else {
-        rows = await sql`
-          SELECT * FROM scraped_items
-          WHERE is_published = TRUE AND summary IS NOT NULL AND summary != ''
-          ORDER BY scraped_at DESC
-          LIMIT ${limit}
-        `;
-      }
-      return (rows || []) as ScrapedItem[];
-    } catch (err) {
-      console.error("[content] getScrapedItems query error:", err);
-      return [];
-    }
-  }, 900);
-}
-
 export interface GetTrendingOptions {
-  source?: "Hacker News" | "Product Hunt" | "all";
+  source?: "Hacker News" | "all";
   category?: string;
   sortBy?: "score" | "recent";
+  sort?: "score" | "recent";
   limit?: number;
   offset?: number;
 }
 
-/**
- * Fetch trending items (from Hacker News and Product Hunt) with 15-minute Redis caching.
- */
 export async function getTrendingItems(
   options?: GetTrendingOptions
-): Promise<import("./fetchHackerNews").TrendingItem[]> {
-  const source = options?.source || "all";
-  const category = options?.category || "all";
-  const sortBy = options?.sortBy || "score";
+): Promise<TrendingItem[]> {
+  const category = options?.category && options.category !== "all" ? options.category : undefined;
+  const sortBy = options?.sortBy || options?.sort || "score";
   const limit = options?.limit || 20;
   const offset = options?.offset || 0;
 
-  const cacheKey = `content:trending:${source}:${category}:${sortBy}:${limit}:${offset}`;
-
-  return getOrSetCache(
-    cacheKey,
-    async () => {
-      if (!process.env.DATABASE_URL || process.env.DATABASE_URL.includes("example")) {
-        // Fallback: If DB is not connected in dev mode, fetch live from HN
-        const { fetchHackerNewsTrending } = await import("./fetchHackerNews");
-        const liveHN = await fetchHackerNewsTrending(30, limit);
-        return liveHN;
-      }
-
-      try {
-        const { neon } = await import("@neondatabase/serverless");
-        const sql = neon(process.env.DATABASE_URL);
-
-        let rows: unknown[];
-
-        if (source !== "all" && category !== "all") {
-          rows = sortBy === "recent"
-            ? await sql`
-                SELECT source, external_id, name, url, tagline, category, score, fetched_at
-                FROM trending_items
-                WHERE source = ${source} AND category = ${category}
-                ORDER BY fetched_at DESC
-                LIMIT ${limit} OFFSET ${offset}
-              `
-            : await sql`
-                SELECT source, external_id, name, url, tagline, category, score, fetched_at
-                FROM trending_items
-                WHERE source = ${source} AND category = ${category}
-                ORDER BY score DESC, fetched_at DESC
-                LIMIT ${limit} OFFSET ${offset}
-              `;
-        } else if (source !== "all") {
-          rows = sortBy === "recent"
-            ? await sql`
-                SELECT source, external_id, name, url, tagline, category, score, fetched_at
-                FROM trending_items
-                WHERE source = ${source}
-                ORDER BY fetched_at DESC
-                LIMIT ${limit} OFFSET ${offset}
-              `
-            : await sql`
-                SELECT source, external_id, name, url, tagline, category, score, fetched_at
-                FROM trending_items
-                WHERE source = ${source}
-                ORDER BY score DESC, fetched_at DESC
-                LIMIT ${limit} OFFSET ${offset}
-              `;
-        } else if (category !== "all") {
-          rows = sortBy === "recent"
-            ? await sql`
-                SELECT source, external_id, name, url, tagline, category, score, fetched_at
-                FROM trending_items
-                WHERE category = ${category}
-                ORDER BY fetched_at DESC
-                LIMIT ${limit} OFFSET ${offset}
-              `
-            : await sql`
-                SELECT source, external_id, name, url, tagline, category, score, fetched_at
-                FROM trending_items
-                WHERE category = ${category}
-                ORDER BY score DESC, fetched_at DESC
-                LIMIT ${limit} OFFSET ${offset}
-              `;
-        } else {
-          rows = sortBy === "recent"
-            ? await sql`
-                SELECT source, external_id, name, url, tagline, category, score, fetched_at
-                FROM trending_items
-                ORDER BY fetched_at DESC
-                LIMIT ${limit} OFFSET ${offset}
-              `
-            : await sql`
-                SELECT source, external_id, name, url, tagline, category, score, fetched_at
-                FROM trending_items
-                ORDER BY score DESC, fetched_at DESC
-                LIMIT ${limit} OFFSET ${offset}
-              `;
-        }
-
-        if (!rows || rows.length === 0) {
-          if (offset > 0) return [];
-          const { fetchHackerNewsTrending } = await import("./fetchHackerNews");
-          const liveHN = await fetchHackerNewsTrending(20, limit);
-          return liveHN;
-        }
-
-        return rows as import("./fetchHackerNews").TrendingItem[];
-      } catch (err) {
-        console.error("[content] getTrendingItems DB query error, falling back to live HN:", err);
-        try {
-          if (offset > 0) return [];
-          const { fetchHackerNewsTrending } = await import("./fetchHackerNews");
-          const liveHN = await fetchHackerNewsTrending(20, limit);
-          return liveHN;
-        } catch {
-          return [];
-        }
-      }
-    },
-    900
-  );
-}
-
-/**
- * Get total count of trending items for pagination metadata.
- */
-export async function getTrendingCount(options?: {
-  source?: "Hacker News" | "Product Hunt" | "all";
-  category?: string;
-}): Promise<number> {
-  const source = options?.source || "all";
-  const category = options?.category || "all";
-
-  if (!process.env.DATABASE_URL || process.env.DATABASE_URL.includes("example")) {
-    return 25;
-  }
-
   try {
-    const { neon } = await import("@neondatabase/serverless");
-    const sql = neon(process.env.DATABASE_URL);
+    const rawItems = await fetchHackerNewsTrending(15, 60);
+    let filtered = rawItems;
 
-    let res: Array<Record<string, unknown>>;
-
-    if (source !== "all" && category !== "all") {
-      res = await sql`
-        SELECT count(*) as count
-        FROM trending_items
-        WHERE source = ${source} AND category = ${category}
-      `;
-    } else if (source !== "all") {
-      res = await sql`
-        SELECT count(*) as count
-        FROM trending_items
-        WHERE source = ${source}
-      `;
-    } else if (category !== "all") {
-      res = await sql`
-        SELECT count(*) as count
-        FROM trending_items
-        WHERE category = ${category}
-      `;
-    } else {
-      res = await sql`
-        SELECT count(*) as count
-        FROM trending_items
-      `;
+    if (category) {
+      filtered = filtered.filter((item) => item.category === category);
     }
 
-    return Number(res[0]?.count) || 0;
+    if (sortBy === "recent") {
+      filtered.sort((a, b) => {
+        const timeA = a.fetched_at ? new Date(a.fetched_at).getTime() : 0;
+        const timeB = b.fetched_at ? new Date(b.fetched_at).getTime() : 0;
+        return timeB - timeA;
+      });
+    } else {
+      filtered.sort((a, b) => b.score - a.score);
+    }
+
+    return filtered.slice(offset, offset + limit);
+  } catch (err) {
+    console.error("[content] getTrendingItems error:", err);
+    return [];
+  }
+}
+
+export async function getTrendingCount(options?: {
+  source?: "Hacker News" | "all";
+  category?: string;
+}): Promise<number> {
+  const category = options?.category && options.category !== "all" ? options.category : undefined;
+  try {
+    const rawItems = await fetchHackerNewsTrending(15, 60);
+    if (!category) {
+      return rawItems.length;
+    }
+    return rawItems.filter((item) => item.category === category).length;
   } catch (err) {
     console.error("[content] getTrendingCount error:", err);
     return 0;
   }
 }
 
-/**
- * Get all unique slugs for a content type (for static generation).
- */
 export function getAllSlugs(
   type: "articles" | "interviews" | "resources"
 ): string[] {

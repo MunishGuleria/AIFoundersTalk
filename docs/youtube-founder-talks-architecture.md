@@ -1,16 +1,13 @@
-# YouTube Data API v3 Founder Talks Pipeline & Editorial Architecture
+﻿# YouTube Data API v3 Founder Talks Pipeline & Editorial Architecture
 
 ## 1. Executive Overview & Permanent Storage Model
 
-**AI Founders Talk** provides executive-level, tactical intelligence for B2B AI founders, revenue leaders, and operators.
+**AI Founders Talk** provides executive-level, tactical intelligence for B2B AI founders, revenue leaders, and modern operators.
 
 ### Critical Database & Storage Architecture
-- **Permanent Source of Truth**: All published Founder Talks, interviews, case studies, and editorial reports reside **strictly in MDX** under `content/interviews/`.
-- **Zero Additional Database Tables**: The Neon Postgres database retains **EXACTLY 3 canonical tables**:
-  1. `newsletter_signups` (subscribers, double opt-in confirmations, unsubscribes)
-  2. `scraped_items` (external news RSS metadata & LLM summaries with automated TTL retention)
-  3. `trending_items` (Hacker News Algolia & Product Hunt GraphQL launches with automated TTL retention)
-- **NO `founder_talks` database table exists or will be created.** All published conversations are version-controlled MDX documents.
+- **Permanent Source of Truth**: All published Founder Talks, sourced interviews, case studies, and editorial reports reside **strictly in MDX** under `content/interviews/`.
+- **Zero Database Dependencies**: All published conversations are version-controlled MDX documents in content/interviews/.
+- **Route & Directory Compatibility**: The visible user-facing section is titled **"Founder Talks"**, while the filesystem storage (`content/interviews/`) and URL routes (`/interviews`, `/interviews/<slug>`) are maintained for backward compatibility, SEO link preservation, and architectural stability.
 
 ---
 
@@ -22,7 +19,7 @@ To protect journalistic credibility and comply with copyright and fair use, AI F
 | Label | Criteria & Usage |
 | :--- | :--- |
 | **Founder Talk** | Public keynote, fireside chat, or presentation by an AI startup founder. |
-| **Sourced Founder Interview** | Curated third-party video interview conducted by an external publisher/host. |
+| **Sourced Founder Interview** | Curated third-party video or audio interview conducted by an external publisher/host. |
 | **Podcast Conversation** | Episode of a public podcast featuring an AI founder or revenue executive. |
 | **Conference Talk** | Presentation or panel at an industry conference. |
 | **Practitioner Perspective** | Architectural case study, workflow teardown, or technical breakdown from enterprise practitioners. |
@@ -40,7 +37,7 @@ To protect journalistic credibility and comply with copyright and fair use, AI F
 
 ```mermaid
 flowchart TD
-    A[YouTube Data API v3] -->|1. Discovery Queries| B[Editorial Discovery Script]
+    A[YouTube Data API v3] -->|1. Discovery Queries| B[Editorial Discovery Tool]
     B -->|2. Fetch Video Metadata & embeddable status| C[Candidate Verification]
     C -->|3. Validate Founder & Company Identity| D[Editorial Review by Human Editor]
     D -->|4. Synthesize Key Lessons & Takeaways| E[Gemini Quality Gate Validation]
@@ -48,7 +45,7 @@ flowchart TD
     F -->|6. Next.js Static SSG Generation| G[Production /interviews Page]
 ```
 
-### 3.1 Targeted Discovery Queries
+### 3.1 Targeted Discovery Queries (Server-Side Only)
 1. `"AI founder interview" "B2B"`
 2. `"AI startup founder podcast"`
 3. `"AI CEO fireside chat" enterprise`
@@ -70,7 +67,7 @@ Each selected conversation is written to `content/interviews/<slug>.mdx` with co
 
 ```yaml
 ---
-title: "Building Enterprise AI Agents: Key Takeaways from [Founder Name] ([Company])"
+title: "Building Enterprise AI Agents: Key Takeaways from Jane Doe (Acme AI)"
 slug: "building-enterprise-ai-agents-founder-talk"
 pillar: "founder-interviews"
 author: "editorial-team"

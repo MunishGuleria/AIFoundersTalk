@@ -36,7 +36,7 @@ export async function GET() {
   if (articles.length > 0) {
     content += `## Articles\n\n`;
     for (const article of articles) {
-      content += `- [${article.title}](${absoluteUrl(`/articles/${article.slug}`)}) ? ${article.excerpt.slice(0, 120)}...\n`;
+      content += `- [${article.title}](${absoluteUrl(`/articles/${article.slug}`)}) - ${article.excerpt.slice(0, 120)}...\n`;
     }
     content += `\n`;
   }
@@ -44,7 +44,7 @@ export async function GET() {
   if (interviews.length > 0) {
     content += `## Interviews\n\n`;
     for (const item of interviews) {
-      content += `- [${item.title}](${absoluteUrl(`/interviews/${item.slug}`)}) ? ${item.excerpt.slice(0, 120)}...\n`;
+      content += `- [${item.title}](${absoluteUrl(`/interviews/${item.slug}`)}) - ${item.excerpt.slice(0, 120)}...\n`;
     }
     content += `\n`;
   }
@@ -52,7 +52,7 @@ export async function GET() {
   if (resources.length > 0) {
     content += `## Resources & Comparisons\n\n`;
     for (const item of resources) {
-      content += `- [${item.title}](${absoluteUrl(`/resources/${item.slug}`)}) ? ${item.excerpt.slice(0, 120)}...\n`;
+      content += `- [${item.title}](${absoluteUrl(`/resources/${item.slug}`)}) - ${item.excerpt.slice(0, 120)}...\n`;
     }
     content += `\n`;
   }

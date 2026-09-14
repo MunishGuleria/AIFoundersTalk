@@ -1,6 +1,8 @@
-import { getAllContentMixed, getScrapedItems, getTrendingItems } from "@/lib/content";
+// ISR Revalidation: 1 hour for aggregation & listing pages
+export const revalidate = 3600;
+
+import { getAllContentMixed, getTrendingItems } from "@/lib/content";
 import { ArticleCard } from "@/components/ArticleCard";
-import { ScrapedItemCard } from "@/components/ScrapedItemCard";
 import { TrendingStartupsPanel } from "@/components/TrendingStartupsPanel";
 import { NewsletterStrip } from "@/components/NewsletterForm";
 import { PILLARS, PillarKey } from "@/lib/taxonomy";
@@ -9,8 +11,13 @@ import Link from "next/link";
 export default async function HomePage() {
   const featured = getAllContentMixed({ featured: true, limit: 1 });
   const latest = getAllContentMixed({ limit: 6 });
-  const scrapedNews = await getScrapedItems({ limit: 6 });
-  const trendingStartups = await getTrendingItems({ limit: 6, sortBy: "score" });
+  let trendingStartups: import("@/lib/fetchHackerNews").TrendingItem[] = [];
+  
+  try {
+    trendingStartups = await getTrendingItems({ limit: 6, sortBy: "score" });
+  } catch (err) {
+    console.warn("[HomePage] Error fetching trending items:", err);
+  }
 
   const featuredPillarKey: PillarKey = "tool-guides";
   const featuredPillar = PILLARS[featuredPillarKey];
@@ -144,38 +151,12 @@ export default async function HomePage() {
         )}
       </section>
 
-      {/* ─── Trending Section (HN & Product Hunt Official APIs) ─── */}
+      {/* ─── Trending Section (Hacker News Official API) ─── */}
       <section className="container-wide pt-6 pb-10 border-t border-slate-200">
         <TrendingStartupsPanel initialItems={trendingStartups} isCompactPreview={true} previewLimit={6} />
       </section>
 
-      {/* ─── Industry Dispatches & Scraped Feed Summaries (With Mandatory Source Attribution) ─── */}
-      {scrapedNews && scrapedNews.length > 0 && (
-        <section className="container-wide py-10 border-t border-slate-200">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 pb-2 border-b border-slate-200 gap-2">
-            <div>
-              <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded border border-slate-200 inline-block mb-1.5 font-sans">
-                Live Industry Dispatches
-              </span>
-              <h2
-                className="text-lg sm:text-xl font-bold text-slate-900 m-0"
-                style={{ fontFamily: "var(--font-serif)" }}
-              >
-                AI &amp; B2B News Summaries
-              </h2>
-            </div>
-            <p className="text-xs text-slate-500 m-0 font-sans">
-              Curated from top publications • Summarized by AI • Mandatory source attribution
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {scrapedNews.map((item) => (
-              <ScrapedItemCard key={item.id || item.url} item={item} />
-            ))}
-          </div>
-        </section>
-      )}
+      
 
       {/* ─── Featured Pillar Block ─── */}
       <section className="py-12 bg-white border-t border-b border-slate-200">
