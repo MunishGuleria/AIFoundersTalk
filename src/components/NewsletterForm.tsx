@@ -39,7 +39,7 @@ export function NewsletterForm({
 
       if (res.ok) {
         setStatus("success");
-        setMessage(data.message || "Please check your inbox to confirm your subscription.");
+        setMessage(data.message || "Thank you for subscribing to AI Founders Talk!");
         setEmail("");
         setWebsite("");
 
@@ -70,10 +70,10 @@ export function NewsletterForm({
           <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
-          <span>Check your inbox to confirm!</span>
+          <span>You&apos;re subscribed!</span>
         </div>
         <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-sans">
-          {message || "We sent a verification link to your email. Click it to activate your free subscription."}
+          {message || "Thank you for subscribing to AI Founders Talk. You'll receive our next edition in your inbox."}
         </p>
       </div>
     );
