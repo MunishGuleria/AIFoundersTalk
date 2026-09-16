@@ -1,4 +1,4 @@
-﻿import { absoluteUrl } from "./siteUrl";
+import { absoluteUrl } from "./siteUrl";
 import { generateUnsubscribeToken } from "./newsletterToken";
 
 export interface WelcomeEmailOptions {

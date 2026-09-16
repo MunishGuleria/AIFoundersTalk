@@ -1,6 +1,9 @@
-﻿# AI Founders Talk — Tactical AI & RevOps Publication (V1)
+# AI Founders Talk — Tactical AI & RevOps Publication (V1)
 
 **AI Founders Talk** is an independent trade publication delivering deep-dive analyses, honest tool benchmarks, competitive intelligence, and tactical implementation guides on agentic AI workflows, B2B sales automation, and revenue operations (RevOps).
+
+- **Canonical Production URL**: [https://www.aifounderstalk.com](https://www.aifounderstalk.com)
+- **Apex Domain Redirect**: `https://aifounderstalk.com` permanently redirects (HTTP 308) to `https://www.aifounderstalk.com`.
 
 ---
 
@@ -13,6 +16,7 @@
 2. **Vercel & Next.js 16 App Router**:
    - High-performance serverless runtime with Turbopack, static site generation (SSG), and incremental static regeneration (ISR).
    - Fast page rendering and global edge CDN delivery.
+   - Canonical production hostname: `https://www.aifounderstalk.com`.
 
 3. **Hacker News Dynamic Trending**:
    - Hacker News is the **only dynamic external content source** in V1.
@@ -146,7 +150,7 @@ Copy `.env.local.example` to `.env.local` for local development. **Never commit 
 
 | Variable | Scope | Required | Purpose |
 | :--- | :--- | :--- | :--- |
-| `NEXT_PUBLIC_SITE_URL` | Client/Server | Production | Canonical site URL (defaults to `http://localhost:3000` locally). |
+| `NEXT_PUBLIC_SITE_URL` | Client/Server | Production | Canonical site URL (defaults to `http://localhost:3000` locally; `https://www.aifounderstalk.com` in production). |
 | `NEXT_PUBLIC_GA4_ID` | Client | Optional | Google Analytics 4 measurement ID. |
 | `UPSTASH_REDIS_REST_URL` | Server-side | Production | Upstash Redis REST endpoint for rate limiting & safety limits. |
 | `UPSTASH_REDIS_REST_TOKEN` | Server-side | Production | Upstash Redis REST authentication token. |

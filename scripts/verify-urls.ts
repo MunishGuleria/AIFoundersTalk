@@ -35,8 +35,8 @@ async function run() {
   const llmsText = await llmsRes.text();
   console.log("llms.txt sample links:", llmsText.split("\n").filter(l => l.includes("http")).slice(0, 3));
 
-  console.log("\n=== 2. PRODUCTION SIMULATION (NEXT_PUBLIC_SITE_URL=https://aifounderstalk.com) ===");
-  process.env.NEXT_PUBLIC_SITE_URL = "https://aifounderstalk.com";
+  console.log("\n=== 2. PRODUCTION SIMULATION (NEXT_PUBLIC_SITE_URL=https://www.aifounderstalk.com) ===");
+  process.env.NEXT_PUBLIC_SITE_URL = "https://www.aifounderstalk.com";
 
   console.log("Prod Base Site URL:", getSiteUrl());
   console.log("Prod Absolute /articles URL:", absoluteUrl("/articles"));

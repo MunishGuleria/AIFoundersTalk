@@ -1,4 +1,4 @@
-﻿# AI Founders Talk — SEO, AEO, Metadata & Social Sharing Architecture
+# AI Founders Talk - SEO, AEO, Metadata & Social Sharing Architecture
 
 This document specifies the Search Engine Optimization (SEO), Answer Engine Optimization (AEO), Generative Engine Optimization (GEO), and Social Sharing systems implemented in **AI Founders Talk**.
 
@@ -9,7 +9,7 @@ This document specifies the Search Engine Optimization (SEO), Answer Engine Opti
 Modern B2B technical publications must optimize not only for traditional search engines (Google, Bing) but also for AI answer engines (ChatGPT Search, Perplexity, Claude, Google Gemini / AI Overviews).
 
 ### Core Principles
-1. **Deterministic Canonical URLs**: Every page resolves a canonical URL via the centralized `src/lib/siteUrl.ts` helper.
+1. **Deterministic Canonical URLs**: Every page resolves a canonical URL via the centralized `src/lib/siteUrl.ts` helper (`https://www.aifounderstalk.com`).
 2. **Deep Semantic Markup**: Strict semantic heading hierarchy (`<h1>` unique per page, logical `<h2>`/`<h3>` nesting) and rich structured data.
 3. **Multi-Model Indexing**: Dedicated feeds and crawl directives specifically formatted for LLM citation crawlers (`/llms.txt`, allowed AI user agents in `/robots.txt`).
 4. **Rich Social Graph**: Open Graph and Twitter Card metadata configured across all dynamic and static pages.
@@ -19,16 +19,18 @@ Modern B2B technical publications must optimize not only for traditional search 
 
 ## 2. Canonical Route Taxonomy
 
+The canonical production domain is `https://www.aifounderstalk.com`. The apex domain (`https://aifounderstalk.com`) permanently redirects (HTTP 308) to the `www` canonical host.
+
 The following canonical route conventions are strictly enforced:
 
 | Content Type | Canonical URL Pattern | Notes |
 | :--- | :--- | :--- |
-| **Articles** | `https://aifounderstalk.com/articles/<slug>` | Dynamic MDX content from `content/articles/` |
-| **Founder Talks** | `https://aifounderstalk.com/interviews/<slug>` | Dynamic MDX content from `content/interviews/` |
-| **Resources** | `https://aifounderstalk.com/resources/<slug>` | Dynamic MDX content from `content/resources/` |
-| **Trending Hub** | `https://aifounderstalk.com/trending` | Aggregated view |
-| **Trending Sources** | `https://aifounderstalk.com/trending/<source>` | Source-specific views (`hacker-news`, `product-hunt`) |
-| **Static Pages** | `https://aifounderstalk.com/<page>` | `/about`, `/editorial-policy`, `/newsletter`, `/privacy`, `/terms` |
+| **Articles** | `https://www.aifounderstalk.com/articles/<slug>` | Dynamic MDX content from `content/articles/` |
+| **Founder Talks** | `https://www.aifounderstalk.com/interviews/<slug>` | Dynamic MDX content from `content/interviews/` |
+| **Resources** | `https://www.aifounderstalk.com/resources/<slug>` | Dynamic MDX content from `content/resources/` |
+| **Trending Hub** | `https://www.aifounderstalk.com/trending` | Aggregated view |
+| **Trending Sources** | `https://www.aifounderstalk.com/trending/<source>` | Source-specific views (`hacker-news`) |
+| **Static Pages** | `https://www.aifounderstalk.com/<page>` | `/about`, `/editorial-policy`, `/newsletter`, `/privacy`, `/terms` |
 
 > [!NOTE]
 > **Founder Talks URL Stability**: While the UI navigation and branding prominently display **"Founder Talks"**, the canonical URL route remains `/interviews/<slug>` to preserve established links and avoid breaking changes.
@@ -75,8 +77,8 @@ Structured data is rendered as type-safe, escaped JSON-LD scripts in `src/compon
   "@context": "https://schema.org",
   "@type": "Organization",
   "name": "AI Founders Talk",
-  "url": "https://aifounderstalk.com",
-  "logo": "https://aifounderstalk.com/icon.svg",
+  "url": "https://www.aifounderstalk.com",
+  "logo": "https://www.aifounderstalk.com/icon.svg",
   "description": "Interviews, analysis, and tactical insights from AI founders and revenue leaders."
 }
 ```
@@ -98,13 +100,13 @@ Supports `Article`, `BlogPosting`, and `TechArticle` schemas:
     "name": "AI Founders Talk",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://aifounderstalk.com/icon.svg"
+      "url": "https://www.aifounderstalk.com/icon.svg"
     }
   },
   "datePublished": "2026-09-10",
   "dateModified": "2026-09-10",
-  "url": "https://aifounderstalk.com/articles/slug",
-  "image": "https://aifounderstalk.com/images/articles/cover.jpg",
+  "url": "https://www.aifounderstalk.com/articles/slug",
+  "image": "https://www.aifounderstalk.com/images/articles/cover.jpg",
   "wordCount": 1850,
   "keywords": "ai-agents, revops, sales-automation"
 }
@@ -122,7 +124,7 @@ Generates `FAQPage` schema with explicit `Question` and `Answer` pairs to enable
 
 ### Dynamic XML Sitemap (`src/app/sitemap.ts`)
 - Automatically discovers and maps all static pages with designated change frequencies and priorities (e.g. `/` at 1.0, `/articles` at 0.9, `/trending` at 0.85).
-- Dynamically scans MDX content slugs across `articles`, `interviews`, and `resources` directories, resolving absolute canonical URLs.
+- Dynamically scans MDX content slugs across `articles`, `interviews`, and `resources` directories, resolving absolute canonical URLs at `https://www.aifounderstalk.com`.
 
 ### Robots Directive (`src/app/robots.ts`)
 - Allows public indexing across the entire site while disallowing private `/api/` endpoints.
@@ -132,7 +134,7 @@ Generates `FAQPage` schema with explicit `Question` and `Answer` pairs to enable
   - `ClaudeBot` (Anthropic AI indexing)
   - `Google-Extended` (Google Gemini / AI Overviews training and citation engine)
   - `CCBot` (Common Crawl)
-- Declares the dynamic sitemap location (`/sitemap.xml`).
+- Declares the dynamic sitemap location (`https://www.aifounderstalk.com/sitemap.xml`).
 
 ### LLM Indexing Feed (`src/app/llms.txt/route.ts`)
 - Serves `/llms.txt` as a lightweight plain text markdown feed summarizing the publication's scope, subject pillars, and top articles.

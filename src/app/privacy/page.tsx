@@ -20,13 +20,13 @@ export default function PrivacyPage() {
           Privacy Policy
         </h1>
         <p className="text-sm text-slate-500 font-sans">
-          Last updated: January 15, 2026 A Effective Date: January 1, 2026
+          Last updated: January 15, 2026 &bull; Effective Date: January 1, 2026
         </p>
       </header>
 
       <div className="prose prose-slate max-w-none text-slate-700 leading-relaxed space-y-6 text-sm sm:text-base">
         <p>
-          At <strong>AI Founders Talk</strong> (accessible from <Link href="/" className="text-slate-900 underline">aifounderstalk.com</Link>), the privacy of our visitors and subscribers is of paramount importance. This Privacy Policy document outlines the types of information collected and recorded by AI Founders Talk and how we use it.
+          At <strong>AI Founders Talk</strong> (accessible from <Link href="/" className="text-slate-900 underline">www.aifounderstalk.com</Link>), the privacy of our visitors and subscribers is of paramount importance. This Privacy Policy document outlines the types of information collected and recorded by AI Founders Talk and how we use it.
         </p>
 
         <h2 className="text-xl font-bold text-slate-900 mt-8 mb-3" style={{ fontFamily: "var(--font-serif)" }}>

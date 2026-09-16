@@ -29,6 +29,23 @@ const nextConfig: NextConfig = {
   // Performance
   reactStrictMode: true,
 
+  // Permanent Apex -> WWW Redirect
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [
+          {
+            type: "host",
+            value: "aifounderstalk.com",
+          },
+        ],
+        destination: "https://www.aifounderstalk.com/:path*",
+        permanent: true,
+      },
+    ];
+  },
+
   // Headers for security and caching
   async headers() {
     return [

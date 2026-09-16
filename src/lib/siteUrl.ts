@@ -7,7 +7,7 @@
  * - Local Development: When NEXT_PUBLIC_SITE_URL is not explicitly configured,
  *   falls back safely to "http://localhost:3000" (or Vercel preview URL if present).
  * - Production: When deployed, NEXT_PUBLIC_SITE_URL must be configured as
- *   "https://aifounderstalk.com".
+ *   "https://www.aifounderstalk.com".
  * 
  * Centralizes URL construction across canonical metadata, Open Graph,
  * JSON-LD schemas, sitemap.xml, robots.txt, llms.txt, and share widgets.
@@ -21,6 +21,9 @@ export function getSiteUrl(): string {
   }
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`.replace(/\/+$/, "");
+  }
+  if (process.env.NODE_ENV === "production") {
+    return "https://www.aifounderstalk.com";
   }
   return "http://localhost:3000";
 }
