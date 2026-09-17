@@ -59,6 +59,8 @@ const MIN_CITATIONS = 1;
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
 
+const contentCache = new Map<string, ContentItem>();
+
 function getContentDir(type: "articles" | "interviews" | "resources") {
   return path.join(CONTENT_DIR, type);
 }
@@ -69,6 +71,10 @@ export function getContentBySlug(
 ): ContentItem | null {
   const dir = getContentDir(type);
   const filePath = path.join(dir, slug + ".mdx");
+  const cacheKey = `${type}:${slug}`;
+  if (process.env.NODE_ENV === "production" && contentCache.has(cacheKey)) {
+    return contentCache.get(cacheKey)!;
+  }
 
   if (!fs.existsSync(filePath)) {
     return null;
@@ -123,7 +129,11 @@ export function getContentBySlug(
     type: singularType,
   };
 
-  return { meta, content };
+  const result = { meta, content };
+  if (process.env.NODE_ENV === "production") {
+    contentCache.set(cacheKey, result);
+  }
+  return result;
 }
 
 export function getAllContent(

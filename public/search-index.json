@@ -1,0 +1,147 @@
+[
+  {
+    "title": "Enterprise Multi-Agent RevOps Governance: How Hybrid Reasoning Architectures Eliminate Pipeline Reconciliation Overhead",
+    "slug": "enterprise-multi-agent-revops-governance-hybrid-reasoning",
+    "pillar": "crm-pipeline",
+    "excerpt": "Uncoordinated AI integrations frequently create conflicting CRM writes and pipeline reconciliation friction. Learn how enterprise RevOps leaders leverage hybrid reasoning architectures, deterministic schema validation, and dual-loop HITL controls to eliminate data collisions and stabilize forecasting.",
+    "tags": [
+      "revops",
+      "multi-agent-systems",
+      "ai-governance",
+      "sales-pipeline",
+      "crm-strategy"
+    ],
+    "type": "article",
+    "publishedAt": "2026-09-09"
+  },
+  {
+    "title": "Microsoft 2026 'AI at Work' Architecture: Autonomous Sales Agents & Copilot Studio Consolidation",
+    "slug": "microsoft-copilot-sales-agentic-roadmap-2026",
+    "pillar": "ai-tools",
+    "excerpt": "Microsoft has officially consolidated its enterprise AI roadmap into the unified 'AI at Work' agentic architecture. Explore how autonomous Sales Development Agents operate natively inside Outlook, Teams, and Dynamics 365.",
+    "tags": [
+      "microsoft-teams",
+      "copilot",
+      "sales-agent",
+      "dynamics-365"
+    ],
+    "type": "article",
+    "publishedAt": "2026-09-07"
+  },
+  {
+    "title": "The 5% RevOps Performance Gap: Why 95% of AI Sales Tool Deployments Fail to Improve Win Rates",
+    "slug": "revops-ai-performance-gap-2026",
+    "pillar": "crm-strategy",
+    "excerpt": "While 96% of enterprise revenue teams have deployed AI sales tools in 2026, recent industry benchmarks show only 5% demonstrate measurable win-rate expansion. Discover the systemic root causes and how top teams bridge the depth gap.",
+    "tags": [
+      "revops",
+      "sales-performance",
+      "crm-data",
+      "ai-productivity",
+      "enterprise"
+    ],
+    "type": "article",
+    "publishedAt": "2026-09-07"
+  },
+  {
+    "title": "Enterprise RevOps Benchmark 2026: AI-Powered Data Unification Across CRM & Sales Stacks",
+    "slug": "enterprise-revops-data-unification-guide",
+    "pillar": "crm-pipeline",
+    "excerpt": "How leading enterprise revenue operations teams are unifying CRM, ERP, and sales intelligence data in 2026 — with benchmarks, implementation timelines, and platform criteria.",
+    "tags": [
+      "revops",
+      "crm-strategy",
+      "microsoft-teams",
+      "data-unification",
+      "enterprise-ai"
+    ],
+    "type": "resource",
+    "publishedAt": "2026-09-07"
+  },
+  {
+    "title": "Agentic AI in Microsoft 365: Autonomous Sales Agents vs. Human RevOps Teams",
+    "slug": "agentic-ai-sales-workflows-microsoft-365",
+    "pillar": "ai-tools",
+    "excerpt": "Autonomous AI agents are migrating from simple chat assistants to background workers capable of drafting proposals, updating CRM records, and conducting competitive intelligence autonomously.",
+    "tags": [
+      "agentic-ai",
+      "microsoft-365",
+      "copilot",
+      "sales-automation"
+    ],
+    "type": "article",
+    "publishedAt": "2026-09-06"
+  },
+  {
+    "title": "The 2026 Evolution of Enterprise CRM: How AI Copilots Automate Data Unification & Pipeline Forecasting",
+    "slug": "future-of-crm-ai-copilots-2026",
+    "pillar": "crm-strategy",
+    "excerpt": "Manual CRM updates are officially dead. Discover how modern RevOps teams leverage AI copilots, direct ERP integration, and automated deal intelligence to eliminate administrative drag.",
+    "tags": [
+      "crm-strategy",
+      "ai-copilot",
+      "revops",
+      "salesforce"
+    ],
+    "type": "article",
+    "publishedAt": "2026-09-05"
+  },
+  {
+    "title": "Best AI Sales Intelligence Tools for Microsoft Teams (2026 Guide)",
+    "slug": "best-ai-sales-intelligence-tools-microsoft-teams-2026",
+    "pillar": "tool-guides",
+    "excerpt": "We compared leading AI-powered sales intelligence tools that integrate with Microsoft Teams — evaluating competitive intel depth, CRM sync quality, pricing model, and actual seller adoption.",
+    "tags": [
+      "sales-tools",
+      "microsoft-teams",
+      "comparison",
+      "sales-intelligence",
+      "ai-tools"
+    ],
+    "type": "resource",
+    "publishedAt": "2026-09-05"
+  },
+  {
+    "title": "How AI Sales Tools Are Reshaping Competitive Intelligence in 2026",
+    "slug": "ai-sales-tools-competitive-intelligence-2026",
+    "pillar": "competitive-intelligence",
+    "excerpt": "Competitive intelligence is no longer a quarterly slide deck — AI tools now surface competitor moves in real time, directly inside sales workflows. Here's what's changed and which approaches actually work.",
+    "tags": [
+      "competitive-intelligence",
+      "sales-tools",
+      "ai",
+      "battlecards"
+    ],
+    "type": "article",
+    "publishedAt": "2026-09-01"
+  },
+  {
+    "title": "What Is AEO? How B2B Companies Can Optimize for AI Answer Engines",
+    "slug": "what-is-aeo-ai-answer-engine-optimization",
+    "pillar": "aeo-ai-search",
+    "excerpt": "AEO (Answer Engine Optimization) is the practice of structuring your content so that AI systems like ChatGPT, Perplexity, and Gemini cite you in their answers. Here's how it works for B2B.",
+    "tags": [
+      "aeo",
+      "ai-search",
+      "seo",
+      "b2b-marketing",
+      "content-strategy"
+    ],
+    "type": "article",
+    "publishedAt": "2026-08-25"
+  },
+  {
+    "title": "Building a Sales Intelligence Platform Inside Microsoft Teams ? Practitioner Architecture & Workflow Lessons",
+    "slug": "sales-intelligence-microsoft-teams-interview",
+    "pillar": "founder-interviews",
+    "excerpt": "An architectural deep-dive into how enterprise RevOps teams embed competitive intelligence and CRM workflows directly inside Microsoft Teams to eliminate tool-switching friction and elevate seller adoption.",
+    "tags": [
+      "microsoft-teams",
+      "sales-intelligence",
+      "revops",
+      "practitioner-case-study"
+    ],
+    "type": "interview",
+    "publishedAt": "2026-08-20"
+  }
+]

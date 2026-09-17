@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ContentMeta } from "@/lib/content";
+import { SearchResultItem, loadSearchIndex, filterSearchItems } from "@/lib/search";
 
-type SearchResult = ContentMeta;
+export type SearchResult = SearchResultItem;
 
 interface SearchBarProps {
   isAlwaysExpanded?: boolean;
@@ -34,8 +34,20 @@ export function SearchBar({
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const queryCache = useRef(new Map<string, SearchResult[]>());
 
   const isExpanded = isAlwaysExpanded || isUserExpanded;
+
+  // Warm up the search index when user expands or focuses
+  const preloadIndex = useCallback(() => {
+    loadSearchIndex().catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (isExpanded) {
+      preloadIndex();
+    }
+  }, [isExpanded, preloadIndex]);
 
   useEffect(() => {
     if (isAlwaysExpanded && autoFocus) {
@@ -63,36 +75,75 @@ export function SearchBar({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [query, isAlwaysExpanded]);
 
-  // Debounced search query
+  // Fast, debounced client-side search (120ms debounce with in-memory caching)
   useEffect(() => {
     const trimmed = query.trim();
+
     if (!trimmed) {
       const emptyTimer = setTimeout(() => {
         setResults([]);
         setIsOpen(false);
+        setIsLoading(false);
       }, 0);
       return () => clearTimeout(emptyTimer);
     }
 
+    if (queryCache.current.has(trimmed)) {
+      const cached = queryCache.current.get(trimmed)!;
+      const cachedTimer = setTimeout(() => {
+        setResults(cached);
+        setIsOpen(true);
+        setIsLoading(false);
+      }, 0);
+      return () => clearTimeout(cachedTimer);
+    }
+
+    const abortController = new AbortController();
+
     const timer = setTimeout(async () => {
       setIsLoading(true);
       try {
-        const res = await fetch(`/api/search?q=${encodeURIComponent(trimmed)}`);
-        const data = await res.json();
-        setResults(data.results || []);
-        setIsOpen(true);
-      } catch (err) {
-        console.error("Search error:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    }, 200);
+        let items: SearchResult[] = [];
+        try {
+          const index = await loadSearchIndex(abortController.signal);
+          items = filterSearchItems(index, trimmed, 6);
+        } catch {
+          if (abortController.signal.aborted) return;
 
-    return () => clearTimeout(timer);
+          // Graceful fallback to /api/search if static index failed to load
+          const res = await fetch(`/api/search?q=${encodeURIComponent(trimmed)}`, {
+            signal: abortController.signal,
+          });
+          const data = await res.json();
+          items = data.results || [];
+        }
+
+        if (!abortController.signal.aborted) {
+          queryCache.current.set(trimmed, items);
+          setResults(items);
+          setIsOpen(true);
+        }
+      } catch (err: unknown) {
+        if (err instanceof DOMException && err.name === "AbortError") {
+          return;
+        }
+        console.error("search-error", err);
+      } finally {
+        if (!abortController.signal.aborted) {
+          setIsLoading(false);
+        }
+      }
+    }, 120);
+
+    return () => {
+      clearTimeout(timer);
+      abortController.abort();
+    };
   }, [query]);
 
   const handleExpand = () => {
     setIsUserExpanded(true);
+    preloadIndex();
     setTimeout(() => {
       inputRef.current?.focus({ preventScroll: true });
     }, 50);
@@ -185,7 +236,10 @@ export function SearchBar({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            onFocus={() => query.trim() && setIsOpen(true)}
+            onFocus={() => {
+              preloadIndex();
+              if (query.trim()) setIsOpen(true);
+            }}
             placeholder={placeholder}
             className={`w-full py-2 pl-9 pr-10 text-xs sm:text-sm bg-white border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-slate-900 shadow-2xs font-sans transition-all duration-150 ${
               fullWidth ? "h-11 sm:h-10 text-sm" : "h-9 sm:h-9"
