@@ -29,6 +29,48 @@ export function OrganizationJsonLd() {
 }
 
 /**
+ * WebSite JSON-LD — rendered once in root layout with search action.
+ */
+export function WebSiteJsonLd() {
+  const siteUrl = getSiteUrl();
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "AI Founders Talk",
+    url: siteUrl,
+    description:
+      "Interviews, analysis, and tactical insights from AI founders and revenue leaders.",
+    publisher: {
+      "@type": "Organization",
+      name: "AI Founders Talk",
+      url: siteUrl,
+      logo: {
+        "@type": "ImageObject",
+        url: absoluteUrl("/icon.svg"),
+      },
+    },
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${siteUrl}/articles?search={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+      }}
+    />
+  );
+}
+
+/**
  * Article JSON-LD — rendered on individual article/interview/resource pages.
  */
 export function ArticleJsonLd({

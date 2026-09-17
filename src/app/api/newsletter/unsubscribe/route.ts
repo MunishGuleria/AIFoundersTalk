@@ -1,4 +1,4 @@
-﻿import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { verifyUnsubscribeToken } from "@/lib/newsletterToken";
 import { absoluteUrl } from "@/lib/siteUrl";
@@ -105,29 +105,41 @@ function renderResponseHtml({
 </html>`;
 }
 
-async function markContactUnsubscribed(email: string) {
-  if (resend) {
-    try {
-      const updateResult = await resend.contacts.update({
-        email,
-        unsubscribed: true,
-      });
+async function markContactUnsubscribed(email: string): Promise<{ success: boolean; error?: string }> {
+  if (!resend) {
+    console.error("[newsletter] Cannot unsubscribe contact: RESEND_API_KEY is not configured.");
+    return { success: false, error: "Newsletter service is not configured." };
+  }
 
-      if (updateResult.error) {
-        // If contact wasn't found by update, create it in unsubscribed state
-        await resend.contacts.create({
-          email,
-          unsubscribed: true,
-        });
-      }
-    } catch (resendError) {
-      console.error(
-        "[newsletter] Resend unsubscribe update error:",
-        resendError instanceof Error ? resendError.message : "Unknown error"
-      );
+  try {
+    const updateResult = await resend.contacts.update({
+      email,
+      unsubscribed: true,
+    });
+
+    if (!updateResult.error) {
+      return { success: true };
     }
-  } else {
-    console.warn(`[newsletter] RESEND_API_KEY unconfigured; simulated unsubscribe for: ${email}`);
+
+    // If contact was not found or failed update, attempt to create it in unsubscribed state
+    const createResult = await resend.contacts.create({
+      email,
+      unsubscribed: true,
+    });
+
+    if (createResult.error) {
+      console.error(
+        "[newsletter] Resend unsubscribe failed during create fallback:",
+        createResult.error.message || "Unknown error"
+      );
+      return { success: false, error: createResult.error.message };
+    }
+
+    return { success: true };
+  } catch (resendError) {
+    const errMsg = resendError instanceof Error ? resendError.message : "Unknown error";
+    console.error("[newsletter] Resend unsubscribe exception:", errMsg);
+    return { success: false, error: errMsg };
   }
 }
 
@@ -165,7 +177,24 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    await markContactUnsubscribed(email);
+    const unsubResult = await markContactUnsubscribed(email);
+
+    if (!unsubResult.success) {
+      console.error(
+        `[newsletter] Failed to unsubscribe subscriber via GET: ${email} - ${unsubResult.error}`
+      );
+      const html = renderResponseHtml({
+        title: "Unsubscribe Error",
+        heading: "Unable to process unsubscription",
+        message: "We encountered an issue updating your subscription with our email provider. Please try again later.",
+        isSuccess: false,
+      });
+      return new NextResponse(html, {
+        status: 500,
+        headers: { "Content-Type": "text/html; charset=utf-8" },
+      });
+    }
+
     console.log(`[newsletter] Subscriber successfully unsubscribed via GET: ${email}`);
 
     const html = renderResponseHtml({
@@ -237,7 +266,18 @@ export async function POST(request: NextRequest) {
     }
 
     // 3. Mark contact as unsubscribed in Resend
-    await markContactUnsubscribed(email);
+    const unsubResult = await markContactUnsubscribed(email);
+
+    if (!unsubResult.success) {
+      console.error(
+        `[newsletter] Failed to unsubscribe subscriber via One-Click POST: ${email} - ${unsubResult.error}`
+      );
+      return NextResponse.json(
+        { error: "Failed to update subscription status. Please try again later." },
+        { status: 500 }
+      );
+    }
+
     console.log(`[newsletter] Subscriber successfully unsubscribed via One-Click POST: ${email}`);
 
     // RFC 8058 requires 200 OK with an empty response for one-click unsubscribe

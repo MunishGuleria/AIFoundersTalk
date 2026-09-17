@@ -3,7 +3,7 @@ import { Source_Serif_4, Source_Sans_3 } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { OrganizationJsonLd } from "@/components/seo/JsonLd";
+import { OrganizationJsonLd, WebSiteJsonLd } from "@/components/seo/JsonLd";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { getSiteUrl } from "@/lib/siteUrl";
 
@@ -56,6 +56,7 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "32x32" },
     ],
     shortcut: "/icon.svg",
     apple: "/icon.svg",
@@ -87,6 +88,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to content
         </a>
         <OrganizationJsonLd />
+        <WebSiteJsonLd />
         <Header />
         <main id="main-content" className="flex-1 pt-16">
           {children}

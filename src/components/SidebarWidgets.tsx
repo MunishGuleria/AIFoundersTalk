@@ -17,7 +17,7 @@ export function SidebarNewsletterWidget({ className = "" }: SidebarNewsletterWid
       </h3>
       <p className="text-sm font-bold text-slate-900 mb-1.5 leading-snug font-sans text-center">
         AI insights every week
-      </p>
+      </p> 
       <p className="text-xs text-slate-600 leading-relaxed mb-4 font-sans text-center">
         Honest tool tests, real founder workflows, zero jargon.
       </p>

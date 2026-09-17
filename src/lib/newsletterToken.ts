@@ -5,10 +5,17 @@ const TOKEN_TTL_SECONDS = 90 * 24 * 60 * 60;
 
 function getSecret(): string {
   const secret = process.env.NEWSLETTER_UNSUBSCRIBE_SECRET?.trim() || process.env.RESEND_API_KEY?.trim();
-  if (secret && secret.length > 0) {
-    return secret;
+  if (
+    !secret ||
+    secret.length < 8 ||
+    secret.includes("placeholder") ||
+    secret.includes("your-resend-api-key") ||
+    secret.includes("your_resend") ||
+    secret.includes("your-secret")
+  ) {
+    throw new Error("NEWSLETTER_UNSUBSCRIBE_SECRET or RESEND_API_KEY is not configured securely.");
   }
-  return "aifounderstalk-default-server-secret";
+  return secret;
 }
 
 export interface UnsubscribePayload {
@@ -18,15 +25,17 @@ export interface UnsubscribePayload {
 
 /**
  * Generates a signed, time-safe token for newsletter unsubscription.
+ * Fails closed if secret is not configured securely.
  */
 export function generateUnsubscribeToken(email: string): string {
+  const secret = getSecret();
   const normalizedEmail = email.trim().toLowerCase();
   const exp = Math.floor(Date.now() / 1000) + TOKEN_TTL_SECONDS;
   const payloadStr = JSON.stringify({ email: normalizedEmail, exp });
   const payloadB64 = Buffer.from(payloadStr, "utf8").toString("base64url");
 
   const signature = crypto
-    .createHmac("sha256", getSecret())
+    .createHmac("sha256", secret)
     .update(payloadB64)
     .digest("base64url");
 
@@ -35,12 +44,20 @@ export function generateUnsubscribeToken(email: string): string {
 
 /**
  * Verifies a signed unsubscribe token and extracts the subscriber email.
+ * Fails closed if secret is missing or signature is invalid.
  */
 export function verifyUnsubscribeToken(
   token: string
 ): { valid: boolean; email?: string; error?: string } {
   if (!token || typeof token !== "string" || !token.includes(".")) {
     return { valid: false, error: "Malformed token" };
+  }
+
+  let secret: string;
+  try {
+    secret = getSecret();
+  } catch {
+    return { valid: false, error: "Unsubscribe secret is not configured securely." };
   }
 
   const parts = token.split(".");
@@ -54,7 +71,7 @@ export function verifyUnsubscribeToken(
   }
 
   const expectedSignature = crypto
-    .createHmac("sha256", getSecret())
+    .createHmac("sha256", secret)
     .update(payloadB64)
     .digest("base64url");
 

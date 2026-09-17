@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { PILLARS, PillarKey } from "@/lib/taxonomy";
 
 export function Footer() {
