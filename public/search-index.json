@@ -143,5 +143,21 @@
     ],
     "type": "interview",
     "publishedAt": "2026-08-20"
+  },
+  {
+    "title": "GPT-6 Astra: The Automation Powerpack for Modern Founders",
+    "slug": "gpt-6-astra-automation-powerpack-ai-founders-talk",
+    "pillar": "",
+    "excerpt": "",
+    "tags": [
+      "GPT-6 Astra",
+      "AI Automation",
+      "AI Agents",
+      "Founders",
+      "Computer Use",
+      "Startup Operations"
+    ],
+    "type": "article",
+    "publishedAt": ""
   }
 ]
