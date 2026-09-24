@@ -76,6 +76,49 @@ function getHeadingId(children: React.ReactNode): string {
     .replace(/\s+/g, "-");
 }
 
+/**
+ * Safe wrapper around next/image for use inside MDX content.
+ * MDX may pass width/height as strings or omit them — this coerces them to
+ * numbers and supplies a sensible 16:9 fallback so Next.js Image never
+ * throws "missing required width property".
+ */
+function MDXImage({
+  src,
+  alt = '',
+  width,
+  height,
+  priority,
+  loading,
+  className,
+}: {
+  src: string;
+  alt?: string;
+  width?: string | number;
+  height?: string | number;
+  priority?: boolean;
+  loading?: 'lazy' | 'eager';
+  className?: string;
+}) {
+  const w = width ? Number(width) : 1600;
+  const h = height ? Number(height) : 900;
+  // Supporting illustrations: centered, constrained to 75% on desktop / max 850px
+  return (
+    <div className="my-8 w-full flex justify-center">
+      <div className="w-full sm:w-11/12 lg:w-3/4 max-w-[850px]">
+        <Image
+          src={src}
+          alt={alt}
+          width={w}
+          height={h}
+          priority={priority}
+          loading={loading}
+          className="w-full h-auto rounded-2xl shadow-sm"
+        />
+      </div>
+    </div>
+  );
+}
+
 export default async function ArticlePage({
   params,
 }: {
@@ -242,6 +285,7 @@ export default async function ArticlePage({
                 },
               }}
               components={{
+                Image: MDXImage,
                 ComparisonTable,
                 DataTable,
                 StatGrid,
