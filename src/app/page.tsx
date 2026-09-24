@@ -14,7 +14,7 @@ export default async function HomePage() {
   let trendingStartups: import("@/lib/fetchHackerNews").TrendingItem[] = [];
   
   try {
-    trendingStartups = await getTrendingItems({ limit: 6, sortBy: "score" });
+    trendingStartups = await getTrendingItems({ limit: 6, sortBy: "trending" });
   } catch (err) {
     console.warn("[HomePage] Error fetching trending items:", err);
   }

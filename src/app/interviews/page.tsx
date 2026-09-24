@@ -1,15 +1,15 @@
 // ISR Revalidation: 1 hour for aggregation & listing pages
 export const revalidate = 3600;
 
-﻿import { getAllContent } from "@/lib/content";
+import { getAllContent } from "@/lib/content";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import { BreadcrumbJsonLd, WebPageJsonLd } from "@/components/seo/JsonLd";
 import { PaginatedArticleList } from "@/components/PaginatedArticleList";
 import { generateListingMetadata } from "@/lib/metadata";
 
 export const metadata = generateListingMetadata(
-  "Founder Talks",
-  "Tactical conversations, keynotes, podcasts, and practitioner perspectives from AI founders and revenue leaders.",
+  "Founder Talks — Tactical Conversations & Keynotes",
+  "Tactical conversations, keynotes, and deep-dives with AI founders, RevOps leaders, and technical practitioners.",
   "/interviews"
 );
 
@@ -21,6 +21,7 @@ interface InterviewsPageProps {
 
 export default async function InterviewsPage({ searchParams }: InterviewsPageProps) {
   const params = await searchParams;
+
   const allInterviews = getAllContent("interviews");
 
   const PAGE_SIZE = 12;
@@ -34,6 +35,12 @@ export default async function InterviewsPage({ searchParams }: InterviewsPagePro
 
   return (
     <>
+      <WebPageJsonLd
+        title="Founder Talks — Tactical Conversations & Keynotes | AI Founders Talk"
+        description="Tactical conversations, keynotes, and deep-dives with AI founders, RevOps leaders, and technical practitioners."
+        url="/interviews"
+        type="CollectionPage"
+      />
       <BreadcrumbJsonLd
         items={[
           { name: "Home", url: "/" },
@@ -51,7 +58,8 @@ export default async function InterviewsPage({ searchParams }: InterviewsPagePro
           Founder Talks
         </h1>
         <p className="text-sm sm:text-base mb-8 max-w-2xl text-gray-600">
-          Tactical conversations, keynotes, podcasts, and practitioner perspectives from AI founders and revenue operations leaders.
+          In-depth discussions with AI entrepreneurs, RevOps leaders,
+          and industry veterans sharing real-world experiences.
         </p>
 
         {interviews.length > 0 ? (
@@ -62,23 +70,21 @@ export default async function InterviewsPage({ searchParams }: InterviewsPagePro
             totalPages={totalPages}
             totalCount={totalCount}
             basePath="/interviews"
-            itemLabel="talks"
+            itemLabel="interviews"
             ariaLabel="Founder Talks pagination"
           />
         ) : (
           <div
-            className="text-center py-20 rounded-xl border bg-white"
+            className="text-center py-20 rounded-xl border"
             style={{
+              background: "var(--surface)",
               borderColor: "var(--border)",
             }}
           >
-            <p className="text-lg font-medium mb-2 text-slate-900">Founder Talks in Curation</p>
-            <p className="text-sm mb-6 text-slate-500">
-              New practitioner breakdowns and curated founder conversations are published weekly. Subscribe to receive updates.
+            <p className="text-lg font-medium mb-2">No interviews yet</p>
+            <p className="text-sm" style={{ color: "var(--text-muted)" }}>
+              Our first founder interviews are coming soon. Subscribe to get notified.
             </p>
-            <a href="/newsletter" className="btn-primary text-sm no-underline inline-block">
-              Subscribe to Newsletter &rarr;
-            </a>
           </div>
         )}
       </div>

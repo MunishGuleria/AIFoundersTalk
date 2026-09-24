@@ -1,15 +1,15 @@
 // ISR Revalidation: 1 hour for aggregation & listing pages
 export const revalidate = 3600;
 
-﻿import { getAllContent } from "@/lib/content";
+import { getAllContent } from "@/lib/content";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import { BreadcrumbJsonLd, WebPageJsonLd } from "@/components/seo/JsonLd";
 import { PaginatedArticleList } from "@/components/PaginatedArticleList";
 import { generateListingMetadata } from "@/lib/metadata";
 
 export const metadata = generateListingMetadata(
   "Resources — Practical Resources for Founders & Operators",
-  "Practical guides, tools, frameworks, checklists, comparisons, and playbooks for founders and operators.",
+  "Tactical guides, tool comparisons, frameworks, and actionable resources for revenue leaders and technical founders.",
   "/resources"
 );
 
@@ -21,6 +21,7 @@ interface ResourcesPageProps {
 
 export default async function ResourcesPage({ searchParams }: ResourcesPageProps) {
   const params = await searchParams;
+
   const allResources = getAllContent("resources");
 
   const PAGE_SIZE = 12;
@@ -34,6 +35,12 @@ export default async function ResourcesPage({ searchParams }: ResourcesPageProps
 
   return (
     <>
+      <WebPageJsonLd
+        title="Resources — Practical Resources for Founders & Operators | AI Founders Talk"
+        description="Tactical guides, tool comparisons, frameworks, and actionable resources for revenue leaders and technical founders."
+        url="/resources"
+        type="CollectionPage"
+      />
       <BreadcrumbJsonLd
         items={[
           { name: "Home", url: "/" },
@@ -51,7 +58,8 @@ export default async function ResourcesPage({ searchParams }: ResourcesPageProps
           Practical Resources for Founders &amp; Operators
         </h1>
         <p className="text-sm sm:text-base mb-8 max-w-2xl text-gray-600">
-          Practical guides, tools, frameworks, checklists, comparisons, and playbooks for founders and operators.
+          Tool comparisons, frameworks, checklists, and guides for designing,
+          evaluating, and deploying AI systems in enterprise revenue operations.
         </p>
 
         {resources.length > 0 ? (
@@ -67,18 +75,16 @@ export default async function ResourcesPage({ searchParams }: ResourcesPageProps
           />
         ) : (
           <div
-            className="text-center py-20 rounded-xl border bg-white"
+            className="text-center py-20 rounded-xl border"
             style={{
+              background: "var(--surface)",
               borderColor: "var(--border)",
             }}
           >
-            <p className="text-lg font-medium mb-2 text-slate-900">Guides coming soon</p>
-            <p className="text-sm mb-6 text-slate-500">
-              Our first comparison guides and tool directories are in the works. Subscribe to get them first.
+            <p className="text-lg font-medium mb-2">No resources yet</p>
+            <p className="text-sm" style={{ color: "var(--text-muted)" }}>
+              Our first resource guides are coming soon. Subscribe to get notified.
             </p>
-            <a href="/newsletter" className="btn-primary text-sm no-underline inline-block">
-              Get Early Access &rarr;
-            </a>
           </div>
         )}
       </div>

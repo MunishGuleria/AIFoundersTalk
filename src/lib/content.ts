@@ -244,63 +244,85 @@ export function getRelatedContent(current: ContentMeta, limit: number = 4): Cont
   return scored.slice(0, limit).map((s) => s.item);
 }
 
+export type TrendingSortMode = "trending" | "score" | "recent";
+
 export interface GetTrendingOptions {
-  source?: "Hacker News" | "all";
+  source?: "Hacker News" | "all" | string;
   category?: string;
-  sortBy?: "score" | "recent";
-  sort?: "score" | "recent";
+  sortBy?: TrendingSortMode;
+  sort?: TrendingSortMode;
   limit?: number;
   offset?: number;
 }
 
-export async function getTrendingItems(
+export interface TrendingDatasetResult {
+  items: TrendingItem[];
+  totalCount: number;
+}
+
+/**
+ * Unified dataset retrieval for Trending discussions:
+ * - 'trending' (default): 7-day freshness window, ranked by hybrid popularity (60%) + 36h exponential decay constant (40%).
+ * - 'score' (Most Upvoted): Broad historical AI/startup pool retrieved from targeted queries, ranked purely by Hacker News points.
+ * - 'recent' (Most Recent): 7-day freshness window, ranked chronologically descending (published_at).
+ *
+ * Single-pass execution reuses the memoized Hacker News fetcher across items and totalCount.
+ */
+export async function getTrendingDataset(
   options?: GetTrendingOptions
-): Promise<TrendingItem[]> {
-  const category = options?.category && options.category !== "all" ? options.category : undefined;
-  const sortBy = options?.sortBy || options?.sort || "score";
-  const limit = options?.limit || 20;
+): Promise<TrendingDatasetResult> {
+  const category = options?.category && options.category !== 'all' ? options.category : undefined;
+  const sortBy: TrendingSortMode = options?.sortBy || options?.sort || 'trending';
+  const limit = options?.limit || 18;
   const offset = options?.offset || 0;
 
   try {
-    const rawItems = await fetchHackerNewsTrending(15, 60);
+    const isHistoricalAllowed = sortBy === 'score';
+    const rawItems = await fetchHackerNewsTrending({ allowHistorical: isHistoricalAllowed });
     let filtered = rawItems;
 
     if (category) {
       filtered = filtered.filter((item) => item.category === category);
     }
 
-    if (sortBy === "recent") {
-      filtered.sort((a, b) => {
-        const timeA = a.fetched_at ? new Date(a.fetched_at).getTime() : 0;
-        const timeB = b.fetched_at ? new Date(b.fetched_at).getTime() : 0;
-        return timeB - timeA;
-      });
+    const totalCount = filtered.length;
+
+    if (sortBy === 'recent') {
+      filtered = [...filtered].sort(
+        (a, b) =>
+          new Date(b.published_at || b.fetched_at || 0).getTime() -
+          new Date(a.published_at || a.fetched_at || 0).getTime()
+      );
+    } else if (sortBy === 'score') {
+      filtered = [...filtered].sort((a, b) => b.score - a.score);
     } else {
-      filtered.sort((a, b) => b.score - a.score);
+      filtered = [...filtered].sort((a, b) => (b.trending_score || 0) - (a.trending_score || 0));
     }
 
-    return filtered.slice(offset, offset + limit);
+    const items = filtered.slice(offset, offset + limit);
+
+    return { items, totalCount };
   } catch (err) {
-    console.error("[content] getTrendingItems error:", err);
-    return [];
+    console.error('[content] getTrendingDataset error:', err);
+    return { items: [], totalCount: 0 };
   }
 }
 
+export async function getTrendingItems(
+  options?: GetTrendingOptions
+): Promise<TrendingItem[]> {
+  const { items } = await getTrendingDataset(options);
+  return items;
+}
+
 export async function getTrendingCount(options?: {
-  source?: "Hacker News" | "all";
+  source?: 'Hacker News' | 'all';
   category?: string;
+  sortBy?: TrendingSortMode;
+  sort?: TrendingSortMode;
 }): Promise<number> {
-  const category = options?.category && options.category !== "all" ? options.category : undefined;
-  try {
-    const rawItems = await fetchHackerNewsTrending(15, 60);
-    if (!category) {
-      return rawItems.length;
-    }
-    return rawItems.filter((item) => item.category === category).length;
-  } catch (err) {
-    console.error("[content] getTrendingCount error:", err);
-    return 0;
-  }
+  const { totalCount } = await getTrendingDataset(options);
+  return totalCount;
 }
 
 export function getAllSlugs(

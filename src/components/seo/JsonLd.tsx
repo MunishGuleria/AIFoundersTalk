@@ -1,18 +1,22 @@
 import { ContentMeta } from "@/lib/content";
-import { getSiteUrl, absoluteUrl } from "@/lib/siteUrl";
+import { absoluteUrl } from "@/lib/siteUrl";
 
-/**
- * Organization JSON-LD — rendered once in root layout.
- */
+const ORGANIZATION_ID = absoluteUrl("/#organization");
+const WEBSITE_ID = absoluteUrl("/#website");
+
 export function OrganizationJsonLd() {
-  const siteUrl = getSiteUrl();
-
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
+    "@id": ORGANIZATION_ID,
     name: "AI Founders Talk",
-    url: siteUrl,
-    logo: absoluteUrl("/icon.svg"),
+    url: absoluteUrl("/"),
+    logo: {
+      "@type": "ImageObject",
+      "@id": absoluteUrl("/icon.svg#logo"),
+      url: absoluteUrl("/icon.svg"),
+      caption: "AI Founders Talk",
+    },
     description:
       "Interviews, analysis, and tactical insights from AI founders and revenue leaders.",
     sameAs: [],
@@ -28,33 +32,23 @@ export function OrganizationJsonLd() {
   );
 }
 
-/**
- * WebSite JSON-LD — rendered once in root layout with search action.
- */
 export function WebSiteJsonLd() {
-  const siteUrl = getSiteUrl();
-
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
+    "@id": WEBSITE_ID,
     name: "AI Founders Talk",
-    url: siteUrl,
+    url: absoluteUrl("/"),
     description:
       "Interviews, analysis, and tactical insights from AI founders and revenue leaders.",
     publisher: {
-      "@type": "Organization",
-      name: "AI Founders Talk",
-      url: siteUrl,
-      logo: {
-        "@type": "ImageObject",
-        url: absoluteUrl("/icon.svg"),
-      },
+      "@id": ORGANIZATION_ID,
     },
     potentialAction: {
       "@type": "SearchAction",
       target: {
         "@type": "EntryPoint",
-        urlTemplate: `${siteUrl}/articles?search={search_term_string}`,
+        urlTemplate: `${absoluteUrl("/articles")}?search={search_term_string}`,
       },
       "query-input": "required name=search_term_string",
     },
@@ -70,9 +64,6 @@ export function WebSiteJsonLd() {
   );
 }
 
-/**
- * Article JSON-LD — rendered on individual article/interview/resource pages.
- */
 export function ArticleJsonLd({
   article,
   authorName,
@@ -93,19 +84,23 @@ export function ArticleJsonLd({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": type,
+    "@id": `${url}#${type.toLowerCase()}`,
+    isPartOf: {
+      "@id": WEBSITE_ID,
+    },
     headline: article.title,
     description: article.excerpt,
-    author: {
-      "@type": "Person",
-      name: authorName,
-    },
+    author: authorName
+      ? {
+          "@type": "Person",
+          name: authorName,
+          url: absoluteUrl("/about"),
+        }
+      : {
+          "@id": ORGANIZATION_ID,
+        },
     publisher: {
-      "@type": "Organization",
-      name: "AI Founders Talk",
-      logo: {
-        "@type": "ImageObject",
-        url: absoluteUrl("/icon.svg"),
-      },
+      "@id": ORGANIZATION_ID,
     },
     datePublished: article.publishedAt,
     dateModified: article.updatedAt || article.publishedAt,
@@ -120,7 +115,7 @@ export function ArticleJsonLd({
         : absoluteUrl(article.coverImage),
     }),
     wordCount: article.wordCount,
-    keywords: article.tags.join(", "),
+    keywords: article.tags ? article.tags.join(", ") : undefined,
   };
 
   return (
@@ -133,9 +128,44 @@ export function ArticleJsonLd({
   );
 }
 
-/**
- * Breadcrumb JSON-LD — rendered on all pages with navigation context.
- */
+export function WebPageJsonLd({
+  title,
+  description,
+  url,
+  type = "WebPage",
+}: {
+  title: string;
+  description: string;
+  url: string;
+  type?: "WebPage" | "CollectionPage" | "AboutPage";
+}) {
+  const pageUrl = url.startsWith("http") ? url : absoluteUrl(url);
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": type,
+    "@id": `${pageUrl}#${type.toLowerCase()}`,
+    url: pageUrl,
+    name: title,
+    description,
+    isPartOf: {
+      "@id": WEBSITE_ID,
+    },
+    publisher: {
+      "@id": ORGANIZATION_ID,
+    },
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+      }}
+    />
+  );
+}
+
 export function BreadcrumbJsonLd({
   items,
 }: {
@@ -162,9 +192,6 @@ export function BreadcrumbJsonLd({
   );
 }
 
-/**
- * FAQ JSON-LD — rendered on resource/comparison pages with Q&A sections.
- */
 export function FaqJsonLd({
   questions,
 }: {

@@ -1,9 +1,9 @@
 // ISR Revalidation: 1 hour for aggregation & listing pages
 export const revalidate = 3600;
 
-﻿import { getAllContent } from "@/lib/content";
+import { getAllContent } from "@/lib/content";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import { BreadcrumbJsonLd, WebPageJsonLd } from "@/components/seo/JsonLd";
 import { PaginatedArticleList } from "@/components/PaginatedArticleList";
 import { PILLARS, PillarKey } from "@/lib/taxonomy";
 import { generateListingMetadata } from "@/lib/metadata";
@@ -41,6 +41,12 @@ export default async function ArticlesPage({ searchParams }: ArticlesPageProps) 
 
   return (
     <>
+      <WebPageJsonLd
+        title="Articles — AI, GTM & Revenue Operations | AI Founders Talk"
+        description="Analysis, strategies, and breakdowns covering competitive intelligence, CRM pipeline, AEO, and AI sales tooling."
+        url="/articles"
+        type="CollectionPage"
+      />
       <BreadcrumbJsonLd
         items={[
           { name: "Home", url: "/" },

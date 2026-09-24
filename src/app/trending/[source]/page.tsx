@@ -1,32 +1,32 @@
-// ISR Revalidation: 1 hour
+// ISR Revalidation: 1 hour for aggregation & listing pages
 export const revalidate = 3600;
 
 import React from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTrendingItems, getTrendingCount } from "@/lib/content";
+import { getTrendingDataset, TrendingSortMode } from "@/lib/content";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import { BreadcrumbJsonLd, WebPageJsonLd } from "@/components/seo/JsonLd";
 import { PaginatedTrendingList } from "@/components/PaginatedTrendingList";
 import { generateListingMetadata } from "@/lib/metadata";
 
-const VALID_SOURCES: Record<string, { label: string; dbSource: "Hacker News"; description: string }> = {
+const VALID_SOURCES: Record<string, { label: string; description: string; dbSource: string }> = {
   "hacker-news": {
     label: "Hacker News",
-    dbSource: "Hacker News",
-    description: "Live pulse of breakout AI discussions, research papers, and founder debates from Hacker News.",
+    description: "Trending AI, machine learning, and startup discussions surfaced directly from Hacker News.",
+    dbSource: "hacker-news",
   },
 };
 
-export async function generateStaticParams() {
-  return [{ source: "hacker-news" }];
+export function generateStaticParams() {
+  return Object.keys(VALID_SOURCES).map((source) => ({ source }));
 }
 
 interface SourcePageProps {
   params: Promise<{ source: string }>;
   searchParams: Promise<{
-    sort?: string;
     category?: string;
+    sort?: string;
     page?: string;
   }>;
 }
@@ -54,7 +54,8 @@ export default async function TrendingSourcePage({ params, searchParams }: Sourc
     notFound();
   }
 
-  const sortBy = sParams.sort === "recent" ? "recent" : "score";
+  const sortParam = sParams.sort;
+  const sortBy: TrendingSortMode = sortParam === "score" ? "score" : sortParam === "recent" ? "recent" : "trending";
   const activeCategory = sParams.category && sParams.category !== "all" ? sParams.category : undefined;
 
   const PAGE_SIZE = 18;
@@ -65,19 +66,16 @@ export default async function TrendingSourcePage({ params, searchParams }: Sourc
   let totalCount = 0;
 
   try {
-    const [fetchedItems, count] = await Promise.all([
-      getTrendingItems({
-        source: config.dbSource,
-        category: activeCategory,
-        sortBy: sortBy,
-        limit: PAGE_SIZE,
-        offset,
-      }),
-      getTrendingCount({ source: config.dbSource, category: activeCategory }),
-    ]);
+    const dataset = await getTrendingDataset({
+      source: config.dbSource,
+      category: activeCategory,
+      sortBy: sortBy,
+      limit: PAGE_SIZE,
+      offset,
+    });
 
-    items = fetchedItems;
-    totalCount = count;
+    items = dataset.items;
+    totalCount = dataset.totalCount;
   } catch (err) {
     console.warn("[trending source page] Query error:", err);
     items = [];
@@ -110,6 +108,12 @@ export default async function TrendingSourcePage({ params, searchParams }: Sourc
 
   return (
     <>
+      <WebPageJsonLd
+        title={`${config.label} AI Trending & Discussions | AI Founders Talk`}
+        description={config.description}
+        url={`/trending/${source}`}
+        type="CollectionPage"
+      />
       <BreadcrumbJsonLd
         items={[
           { name: "Home", url: "/" },
@@ -141,7 +145,7 @@ export default async function TrendingSourcePage({ params, searchParams }: Sourc
             className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight mb-3"
             style={{ fontFamily: "var(--font-serif)" }}
           >
-            {config.label} AI Trending & Discussions
+            {config.label} AI Trending &amp; Discussions
           </h1>
           <p className="text-base text-slate-600 max-w-3xl leading-relaxed font-sans">
             {config.description} Curated by AI Founders Talk with direct links to original discussions.
@@ -151,7 +155,6 @@ export default async function TrendingSourcePage({ params, searchParams }: Sourc
         {/* Filter & Sort Bar */}
         <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs mb-10 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            {/* Topics Row */}
             <div className="flex flex-wrap items-center gap-2 font-sans">
               <span className="text-xs font-medium text-slate-400 mr-1">Topics:</span>
               <Link
@@ -171,25 +174,24 @@ export default async function TrendingSourcePage({ params, searchParams }: Sourc
                   className={`text-xs px-3 py-1.5 rounded-md transition-all no-underline ${
                     activeCategory === cat
                       ? "bg-slate-800 !text-white font-semibold"
-                    : "bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100"
-                }`}
+                      : "bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100"
+                  }`}
                 >
                   {cat}
                 </Link>
               ))}
             </div>
 
-            {/* Sort Toggle */}
             <div className="flex items-center gap-2 font-sans self-start sm:self-auto shrink-0">
-              <span className="text-xs font-semibold text-slate-500">Sort by:</span>
+              <span className="text-xs font-semibold text-slate-500">Mode:</span>
               <div className="flex items-center gap-1 bg-slate-50 p-1 rounded-lg border border-slate-200">
                 <Link
                   href={buildQueryUrl({ sort: "score", page: 1 })}
                   className={`text-xs px-2.5 py-1 rounded-md transition-all no-underline ${
                     sortBy === "score"
                       ? "bg-white text-slate-900 font-bold shadow-2xs"
-                    : "text-slate-600 hover:text-slate-900"
-                }`}
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
                 >
                   Most Upvoted
                 </Link>
@@ -198,8 +200,8 @@ export default async function TrendingSourcePage({ params, searchParams }: Sourc
                   className={`text-xs px-2.5 py-1 rounded-md transition-all no-underline ${
                     sortBy === "recent"
                       ? "bg-white text-slate-900 font-bold shadow-2xs"
-                    : "text-slate-600 hover:text-slate-900"
-                }`}
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
                 >
                   Most Recent
                 </Link>

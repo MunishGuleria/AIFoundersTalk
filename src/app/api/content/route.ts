@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAllContent, getTrendingItems, getTrendingCount } from "@/lib/content";
+import { getAllContent, getTrendingDataset, TrendingSortMode } from "@/lib/content";
 import { PillarKey } from "@/lib/taxonomy";
 
 export async function GET(request: NextRequest) {
@@ -15,26 +15,22 @@ export async function GET(request: NextRequest) {
         mappedSource = "Hacker News";
       }
 
-      const sortParam = searchParams.get("sort") === "recent" ? "recent" : "score";
+      const rawSort = searchParams.get("sort");
+      const validSort: TrendingSortMode =
+        rawSort === "recent" ? "recent" : rawSort === "score" ? "score" : "trending";
       const categoryParam = searchParams.get("category");
       const activeCategory = categoryParam && categoryParam !== "all" ? categoryParam : undefined;
 
       const PAGE_SIZE = 18;
       const offset = (page - 1) * PAGE_SIZE;
 
-      const [items, totalCount] = await Promise.all([
-        getTrendingItems({
-          source: mappedSource,
-          category: activeCategory,
-          sortBy: sortParam,
-          limit: PAGE_SIZE,
-          offset,
-        }),
-        getTrendingCount({
-          source: mappedSource,
-          category: activeCategory,
-        }),
-      ]);
+      const { items, totalCount } = await getTrendingDataset({
+        source: mappedSource,
+        category: activeCategory,
+        sortBy: validSort,
+        limit: PAGE_SIZE,
+        offset,
+      });
 
       const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
       return NextResponse.json({

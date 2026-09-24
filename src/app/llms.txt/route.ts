@@ -12,16 +12,19 @@ export async function GET() {
 
   let content = `# AI Founders Talk
 
-> Interviews, analysis, and tactical insights from AI founders and revenue leaders. Covering competitive intelligence, CRM pipeline hygiene, AEO strategy, and the tools that drive modern sales teams.
+> Plain-English intelligence, tactical guides, tool comparisons, and executive interviews for AI founders, RevOps leaders, and modern operators.
 
-## Key Pages
+## Core Sections
 
 - [Homepage](${absoluteUrl("/")})
-- [All Articles](${absoluteUrl("/articles")})
+- [Articles](${absoluteUrl("/articles")})
 - [Founder Talks](${absoluteUrl("/interviews")})
-- [Resources & Comparisons](${absoluteUrl("/resources")})
-- [About](${absoluteUrl("/about")})
+- [Resources & Guides](${absoluteUrl("/resources")})
+- [Trending AI & Startups](${absoluteUrl("/trending")})
+- [About AI Founders Talk](${absoluteUrl("/about")})
+- [Editorial Policy](${absoluteUrl("/editorial-policy")})
 - [Newsletter](${absoluteUrl("/newsletter")})
+- [HTML Sitemap](${absoluteUrl("/sitemap")})
 
 ## Content Pillars
 
@@ -36,23 +39,23 @@ export async function GET() {
   if (articles.length > 0) {
     content += `## Articles\n\n`;
     for (const article of articles) {
-      content += `- [${article.title}](${absoluteUrl(`/articles/${article.slug}`)}) - ${article.excerpt.slice(0, 120)}...\n`;
+      content += `- [${article.title}](${absoluteUrl(`/articles/${article.slug}`)}) - ${article.excerpt.slice(0, 140)}...\n`;
     }
     content += `\n`;
   }
 
   if (interviews.length > 0) {
-    content += `## Interviews\n\n`;
+    content += `## Founder Talks\n\n`;
     for (const item of interviews) {
-      content += `- [${item.title}](${absoluteUrl(`/interviews/${item.slug}`)}) - ${item.excerpt.slice(0, 120)}...\n`;
+      content += `- [${item.title}](${absoluteUrl(`/interviews/${item.slug}`)}) - ${item.excerpt.slice(0, 140)}...\n`;
     }
     content += `\n`;
   }
 
   if (resources.length > 0) {
-    content += `## Resources & Comparisons\n\n`;
+    content += `## Resources & Guides\n\n`;
     for (const item of resources) {
-      content += `- [${item.title}](${absoluteUrl(`/resources/${item.slug}`)}) - ${item.excerpt.slice(0, 120)}...\n`;
+      content += `- [${item.title}](${absoluteUrl(`/resources/${item.slug}`)}) - ${item.excerpt.slice(0, 140)}...\n`;
     }
     content += `\n`;
   }

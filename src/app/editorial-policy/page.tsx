@@ -1,74 +1,87 @@
-import type { Metadata } from "next";
+import { Metadata } from "next";
+import { BreadcrumbJsonLd, WebPageJsonLd } from "@/components/seo/JsonLd";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { absoluteUrl } from "@/lib/siteUrl";
 
 export const metadata: Metadata = {
-  title: "Editorial Policy & AI Disclosure | AI Founders Talk",
-  description: "Our standards for factual accuracy, research methodology, editorial independence, and AI transparency.",
+  title: "Editorial Policy | AI Founders Talk",
+  description:
+    "Our editorial standards, disclosure policies, citation practices, and AI usage guidelines.",
   alternates: {
-    canonical: "/editorial-policy",
+    canonical: absoluteUrl("/editorial-policy"),
   },
 };
 
 export default function EditorialPolicyPage() {
   return (
-    <div className="w-full max-w-[1000px] mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <Breadcrumbs items={[{ label: "Editorial Policy & AI Disclosure" }]} />
+    <>
+      <WebPageJsonLd
+        title="Editorial Policy | AI Founders Talk"
+        description="Our editorial standards, disclosure policies, citation practices, and AI usage guidelines."
+        url="/editorial-policy"
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "/" },
+          { name: "Editorial Policy", url: "/editorial-policy" },
+        ]}
+      />
 
-      <header className="my-8 pb-6 border-b border-slate-200">
-        <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-3" style={{ fontFamily: "var(--font-serif)" }}>
-          Editorial Standards & AI Transparency Policy
+      <div className="container-content py-12">
+        <Breadcrumbs items={[{ label: "Editorial Policy" }]} />
+
+        <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-black" style={{ fontFamily: "var(--font-serif)" }}>
+          Editorial Policy
         </h1>
-        <p className="text-sm text-slate-500 font-sans">
-          Our commitment to rigorous research, independence, and ethical artificial intelligence usage.
-        </p>
-      </header>
 
-      <div className="prose prose-slate max-w-none text-slate-700 leading-relaxed space-y-6 text-sm sm:text-base">
-        <p>
-          <strong>AI Founders Talk</strong> is an independent digital trade publication covering agentic AI architectures, RevOps automation, enterprise software engineering, and AI search optimization (AEO). To maintain the trust of our readers and AI discovery engines, we operate under strict editorial standards.
-        </p>
+        <div className="prose">
+          <p className="text-sm text-gray-500 mb-6">
+            Last updated: February 15, 2026
+          </p>
 
-        <h2 className="text-xl font-bold text-slate-900 mt-8 mb-3" style={{ fontFamily: "var(--font-serif)" }}>
-          1. Editorial Independence & Objectivity
-        </h2>
-        <p>
-          Our editorial coverage is strictly objective and independent:
-        </p>
-        <ul className="list-disc pl-6 space-y-2">
-          <li><strong>No Pay-for-Play:</strong> Vendors cannot buy positive reviews, rankings, or coverage in our editorial guides. Inclusion in our evaluations is based entirely on technical merit, architecture, market adoption, and industry benchmark data.</li>
-          <li><strong>Separation of Content and Sponsorship:</strong> Any sponsored report or advertising collaboration is clearly and conspicuously labeled as &quot;Sponsored&quot; in compliance with FTC guidelines.</li>
-        </ul>
+          <h2>Mission &amp; Scope</h2>
+          <p>
+            AI Founders Talk is an independent trade publication providing technical and strategic analysis of artificial intelligence, revenue operations, CRM architecture, answer engine optimization (AEO), and competitive intelligence. Our primary audience includes enterprise software founders, chief revenue officers, heads of RevOps, and technical practitioners.
+          </p>
 
-        <h2 className="text-xl font-bold text-slate-900 mt-8 mb-3" style={{ fontFamily: "var(--font-serif)" }}>
-          2. Fact-Checking & Primary Source Verification
-        </h2>
-        <p>
-          Every article published on AI Founders Talk undergoes rigorous verification:
-        </p>
-        <ul className="list-disc pl-6 space-y-2">
-          <li>Claims and data benchmarks are verified against primary sources, including official vendor documentation, enterprise customer case studies, SEC filings, or peer-reviewed research papers.</li>
-          <li>Every article provides a transparent <em>&quot;Sources &amp; Industry References&quot;</em> section with direct outbound links to source material.</li>
-        </ul>
+          <h2>Editorial Independence</h2>
+          <p>
+            Our editorial decisions are made independently of commercial interests. We do not accept payment, equity, or commercial favors in exchange for favorable editorial coverage, product reviews, or interview placement.
+          </p>
 
-        <h2 className="text-xl font-bold text-slate-900 mt-8 mb-3" style={{ fontFamily: "var(--font-serif)" }}>
-          3. AI Usage & Transparency Disclosure (EU AI Act & FTC Aligned)
-        </h2>
-        <p>
-          As a publication covering the frontier of artificial intelligence, we believe in radical transparency regarding our own use of AI tools:
-        </p>
-        <ul className="list-disc pl-6 space-y-2">
-          <li><strong>Research Assistance:</strong> We utilize modern AI models to assist with data aggregation, transcription, syntax formatting, and outline structuring.</li>
-          <li><strong>Human Editorial Oversight:</strong> Every published piece is synthesized, fact-checked, edited, and approved by human domain experts and editors. We do not publish unverified or autonomous AI-generated drafts.</li>
-          <li><strong>Imagery & Media:</strong> We prioritize verified photography, technical architectural diagrams, and structured data tables. When conceptual AI-generated graphics are utilized, they are designated with appropriate image credits.</li>
-        </ul>
+          <h2>Research &amp; Sourcing Standards</h2>
+          <ul>
+            <li><strong>Primary Sourcing:</strong> We prioritize firsthand accounts, primary technical documentation, public filings, and verified product specifications over secondary reporting.</li>
+            <li><strong>Data Integrity:</strong> Quantitative claims (market sizing, benchmarks, performance metrics) are cited to their original methodology and source whenever technically feasible.</li>
+            <li><strong>Attribution:</strong> All direct quotations, proprietary frameworks, and borrowed data points are attributed to the originating author, organization, or publication.</li>
+          </ul>
 
-        <h2 className="text-xl font-bold text-slate-900 mt-8 mb-3" style={{ fontFamily: "var(--font-serif)" }}>
-          4. Corrections and Updates Policy
-        </h2>
-        <p>
-          In the fast-moving AI landscape, accuracy is an ongoing commitment. When an error of fact is identified, we issue a clear correction note at the top or bottom of the article detailing the date and nature of the modification. Readers can report inaccuracies directly to <a href="mailto:editorial@aifounderstalk.com" className="text-blue-600 hover:text-blue-800 underline font-medium">editorial@aifounderstalk.com</a>.
-        </p>
+          <h2>AI Tooling &amp; Content Generation Policy</h2>
+          <p>
+            We cover AI systems and utilize AI tools within our research workflow under strict human supervision:
+          </p>
+          <ul>
+            <li><strong>Human Authorship &amp; Review:</strong> Every article, guide, and interview is conceived, structured, fact-checked, and edited by human editorial staff.</li>
+            <li><strong>Assisted Research:</strong> AI tools may be employed for data synthesis, transcript indexing, and literature search, but are never solely relied upon for factual claims without independent corroboration.</li>
+            <li><strong>Synthetic Media:</strong> Any AI-generated visual assets or illustrations are labeled with clear provenance indicators in the image credit and alt metadata.</li>
+          </ul>
+
+          <h2>Corrections &amp; Updates</h2>
+          <p>
+            We are committed to correcting substantive errors promptly and transparently. When an error is identified:
+          </p>
+          <ul>
+            <li>The content is amended with an explicit update timestamp.</li>
+            <li>A correction notice is appended explaining the nature of the change when a factual inaccuracy altered the core argument.</li>
+            <li>Corrections may be submitted to <a href="mailto:editorial@aifounderstalk.com" className="text-blue-600 hover:text-blue-800 underline">editorial@aifounderstalk.com</a>.</li>
+          </ul>
+
+          <h2>Commercial Disclosures</h2>
+          <p>
+            Where an affiliate relationship or commercial partnership exists between AI Founders Talk and a featured vendor, clear and conspicuous disclosure is provided on the relevant page prior to any commercial link.
+          </p>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -1,16 +1,27 @@
 import { Metadata } from "next";
-import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import Link from "next/link";
+import { BreadcrumbJsonLd, WebPageJsonLd } from "@/components/seo/JsonLd";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { absoluteUrl } from "@/lib/siteUrl";
 
 export const metadata: Metadata = {
   title: "About Us | AI Founders Talk",
   description:
     "AI Founders Talk is a plain-English guide helping business owners, founders, and everyday professionals understand and use AI with zero confusion.",
+  alternates: {
+    canonical: absoluteUrl("/about"),
+  },
 };
 
 export default function AboutPage() {
   return (
     <>
+      <WebPageJsonLd
+        title="About Us | AI Founders Talk"
+        description="AI Founders Talk is a plain-English guide helping business owners, founders, and everyday professionals understand and use AI with zero confusion."
+        url="/about"
+        type="AboutPage"
+      />
       <BreadcrumbJsonLd
         items={[
           { name: "Home", url: "/" },
@@ -39,16 +50,16 @@ export default function AboutPage() {
           </p>
           <ul>
             <li>
-              <strong>Simple AI Tool Reviews:</strong> We test and evaluate tools like ChatGPT, Claude, Microsoft Copilot, and sales automation software to tell you honestly which ones are worth your time and money.
+              <strong>Simple AI Tool Reviews:</strong> We test and evaluate tools like ChatGPT, Claude, Microsoft Copilot, and sales automation software to tell you honestly which ones are worth your time and money. Browse our latest <Link href="/resources" className="text-blue-600 hover:underline font-medium">AI Resources &amp; Guides</Link>.
             </li>
             <li>
-              <strong>Getting Found on AI Search (AEO):</strong> Practical steps to make sure your website and business show up when prospective customers ask questions on ChatGPT, Perplexity, and Google.
+              <strong>Getting Found on AI Search (AEO):</strong> Practical steps to make sure your website and business show up when prospective customers ask questions on ChatGPT, Perplexity, and Google. Explore our <Link href="/articles" className="text-blue-600 hover:underline font-medium">AI Articles &amp; Analysis</Link>.
             </li>
             <li>
-              <strong>Real Founder Stories:</strong> Unfiltered conversations with entrepreneurs sharing the exact workflows, mistakes, and tools they used to grow.
+              <strong>Real Founder Stories:</strong> Unfiltered conversations with entrepreneurs sharing the exact workflows, mistakes, and tools they used to grow. Read our <Link href="/interviews" className="text-blue-600 hover:underline font-medium">Founder Talks &amp; Interviews</Link>.
             </li>
             <li>
-              <strong>Everyday Workflows & Time Savers:</strong> Step-by-step guides on automating administrative work, email follow-ups, and customer tracking so you can focus on what matters most.
+              <strong>Live Industry Trends:</strong> Real-time tracking of AI innovations and startup discussions across the ecosystem. Discover <Link href="/trending" className="text-blue-600 hover:underline font-medium">AI &amp; Startup Trending</Link>.
             </li>
           </ul>
 
@@ -58,7 +69,7 @@ export default function AboutPage() {
               <strong>Plain English First:</strong> If an idea sounds too complicated, we rewrite it until anyone can understand it in under 60 seconds.
             </li>
             <li>
-              <strong>No Pay-For-Play Reviews:</strong> Companies cannot pay to get positive reviews in our guides. We write honest recommendations based on real-world testing.
+              <strong>No Pay-For-Play Reviews:</strong> Companies cannot pay to get positive reviews in our guides. We write honest recommendations based on real-world testing. Read our full <Link href="/editorial-policy" className="text-blue-600 hover:underline font-medium">Editorial Policy</Link>.
             </li>
             <li>
               <strong>Practical Over Hype:</strong> We skip the sci-fi speculation and focus on what AI can actually do for your business right now.

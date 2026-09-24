@@ -1,5 +1,20 @@
 [
   {
+    "title": "GPT-6 Astra: The Automation Powerpack for Modern Founders",
+    "slug": "gpt-6-astra-automation-powerpack-modern-founders",
+    "pillar": "tool-guides",
+    "excerpt": "Why GPT-6 Astra's computer use and end-to-end workflow capabilities could make more everyday digital work delegable for startups.",
+    "tags": [
+      "GPT-6 Astra",
+      "AI Automation",
+      "Computer Use",
+      "AI Agents",
+      "Startup Operations"
+    ],
+    "type": "article",
+    "publishedAt": "2026-09-21"
+  },
+  {
     "title": "Enterprise Multi-Agent RevOps Governance: How Hybrid Reasoning Architectures Eliminate Pipeline Reconciliation Overhead",
     "slug": "enterprise-multi-agent-revops-governance-hybrid-reasoning",
     "pillar": "crm-pipeline",
@@ -143,21 +158,5 @@
     ],
     "type": "interview",
     "publishedAt": "2026-08-20"
-  },
-  {
-    "title": "GPT-6 Astra: The Automation Powerpack for Modern Founders",
-    "slug": "gpt-6-astra-automation-powerpack-ai-founders-talk",
-    "pillar": "",
-    "excerpt": "",
-    "tags": [
-      "GPT-6 Astra",
-      "AI Automation",
-      "AI Agents",
-      "Founders",
-      "Computer Use",
-      "Startup Operations"
-    ],
-    "type": "article",
-    "publishedAt": ""
   }
 ]
