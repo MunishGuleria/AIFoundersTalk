@@ -46,7 +46,7 @@ export function PaginatedTrendingList({
     setError(null);
   }
 
-  const mobileItems = [...initialItems, ...extraItems];
+  const displayItems = extraItems.length > 0 ? [...initialItems, ...extraItems] : initialItems;
   const hasMore = totalPages > 1 && loadedPage < totalPages;
 
   const handleLoadMore = async () => {
@@ -66,7 +66,7 @@ export function PaginatedTrendingList({
       if (!res.ok) throw new Error("Failed to load more trending items");
       const data = await res.json();
 
-      const existingKeys = new Set(mobileItems.map((i) => `${i.source}-${i.external_id}`));
+      const existingKeys = new Set(displayItems.map((i) => `${i.source}-${i.external_id}`));
       const newItems = (data.items || []).filter((i: TrendingItem) => !existingKeys.has(`${i.source}-${i.external_id}`));
 
       setExtraItems((prev) => [...prev, ...newItems]);
@@ -80,17 +80,10 @@ export function PaginatedTrendingList({
 
   return (
     <>
-      {/* Desktop / Tablet Grid (>=640px): uses server-paginated items */}
-      <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-        {initialItems.map((item, idx) => (
-          <TrendingCard key={`dt-${item.source}-${item.external_id}-${idx}`} item={item} />
-        ))}
-      </div>
-
-      {/* Mobile Grid (<640px): appends loaded items without replacing */}
-      <div className="grid sm:hidden grid-cols-1 gap-6 mb-8">
-        {mobileItems.map((item, idx) => (
-          <TrendingCard key={`mb-${item.source}-${item.external_id}-${idx}`} item={item} />
+      {/* Responsive Grid: single DOM mount with responsive CSS column layouts */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 sm:mb-12">
+        {displayItems.map((item, idx) => (
+          <TrendingCard key={`${item.source}-${item.external_id}-${idx}`} item={item} />
         ))}
       </div>
 
@@ -103,7 +96,7 @@ export function PaginatedTrendingList({
           basePath={basePath}
           queryParams={{
             source: source && source !== "all" ? source : undefined,
-            sort: sort !== "score" ? sort : undefined,
+            sort: sort && sort !== "trending" ? sort : undefined,
             category: category && category !== "all" ? category : undefined,
           }}
           itemLabel={itemLabel}

@@ -89,7 +89,6 @@ function MDXImage({
   height,
   priority,
   loading,
-  className,
 }: {
   src: string;
   alt?: string;
@@ -97,7 +96,6 @@ function MDXImage({
   height?: string | number;
   priority?: boolean;
   loading?: 'lazy' | 'eager';
-  className?: string;
 }) {
   const w = width ? Number(width) : 1600;
   const h = height ? Number(height) : 900;
@@ -112,6 +110,7 @@ function MDXImage({
           height={h}
           priority={priority}
           loading={loading}
+          sizes="(max-width: 768px) 100vw, 850px"
           className="w-full h-auto rounded-2xl shadow-sm"
         />
       </div>
@@ -241,6 +240,7 @@ export default async function ArticlePage({
                   width={1200}
                   height={675}
                   priority
+                  sizes="(max-width: 1024px) 100vw, 900px"
                   className="w-full h-auto object-cover"
                 />
               </div>

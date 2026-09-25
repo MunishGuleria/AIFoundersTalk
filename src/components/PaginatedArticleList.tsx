@@ -44,7 +44,7 @@ export function PaginatedArticleList({
     setError(null);
   }
 
-  const mobileItems = [...initialItems, ...extraItems];
+  const displayItems = extraItems.length > 0 ? [...initialItems, ...extraItems] : initialItems;
   const hasMore = totalPages > 1 && loadedPage < totalPages;
 
   const handleLoadMore = async () => {
@@ -62,7 +62,7 @@ export function PaginatedArticleList({
       if (!res.ok) throw new Error("Failed to load more content");
       const data = await res.json();
 
-      const existingSlugs = new Set(mobileItems.map((i) => i.slug));
+      const existingSlugs = new Set(displayItems.map((i) => i.slug));
       const newItems = (data.items || []).filter((i: ContentMeta) => !existingSlugs.has(i.slug));
 
       setExtraItems((prev) => [...prev, ...newItems]);
@@ -76,16 +76,9 @@ export function PaginatedArticleList({
 
   return (
     <>
-      {/* Desktop / Tablet Grid (>=640px): uses server-paginated items */}
-      <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-6 stagger-children">
-        {initialItems.map((item) => (
-          <ArticleCard key={item.slug} article={item} />
-        ))}
-      </div>
-
-      {/* Mobile Grid (<640px): appends loaded items without replacing */}
-      <div className="grid sm:hidden grid-cols-1 gap-6 stagger-children">
-        {mobileItems.map((item) => (
+      {/* Responsive Grid: single DOM mount with responsive CSS column layouts */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 stagger-children">
+        {displayItems.map((item) => (
           <ArticleCard key={item.slug} article={item} />
         ))}
       </div>

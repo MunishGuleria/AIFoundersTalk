@@ -1,4 +1,5 @@
 import { cache } from 'react';
+
 /**
  * Fetch top AI founder & startup discussions from Hacker News via the free official Algolia HN API.
  * Endpoint: https://hn.algolia.com/api/v1/search
@@ -141,129 +142,177 @@ const HISTORICAL_TOPIC_QUERIES = [
   { query: "infra", hits: 15, minScore: 50 },
 ];
 
+interface AlgoliaHit {
+  objectID?: string;
+  title?: string;
+  url?: string;
+  points?: number;
+  num_comments?: number;
+  created_at?: string;
+  created_at_i?: number;
+  author?: string;
+}
+
+interface TopicQueryConfig {
+  query: string;
+  hits: number;
+  minScore: number;
+}
+
+/**
+ * In-memory module cache to eliminate redundant upstream fetches across sort modes and SSR renders.
+ */
+let inMemoryCache: {
+  data: TrendingItem[];
+  timestamp: number;
+} | null = null;
+
+const CACHE_TTL_MS = 3600 * 1000; // 1 hour
+
+/**
+ * Safe bounded concurrency executor.
+ * Runs asynchronous tasks with a maximum concurrency limit without uncontrolled network storms.
+ */
+async function runWithConcurrencyLimit<T, R>(
+  items: T[],
+  fn: (item: T) => Promise<R>,
+  concurrencyLimit: number
+): Promise<PromiseSettledResult<R>[]> {
+  const results: PromiseSettledResult<R>[] = new Array(items.length);
+  let currentIndex = 0;
+
+  const workers = Array.from({ length: Math.min(concurrencyLimit, items.length) }, async () => {
+    while (currentIndex < items.length) {
+      const idx = currentIndex++;
+      try {
+        const value = await fn(items[idx]);
+        results[idx] = { status: "fulfilled", value };
+      } catch (reason) {
+        results[idx] = { status: "rejected", reason };
+      }
+    }
+  });
+
+  await Promise.all(workers);
+  return results;
+}
+
+async function fetchSingleTopicQuery(
+  topic: TopicQueryConfig,
+  minCreatedTimestamp?: number
+): Promise<AlgoliaHit[]> {
+  const numericFilter = minCreatedTimestamp
+    ? `points>${topic.minScore},created_at_i>${minCreatedTimestamp}`
+    : `points>${topic.minScore}`;
+
+  const endpoint = `https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(
+    topic.query
+  )}&tags=story&numericFilters=${numericFilter}&hitsPerPage=${topic.hits}`;
+
+  const res = await fetch(endpoint, {
+    headers: { Accept: "application/json" },
+    next: { revalidate: 3600 },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Algolia HN API responded with HTTP ${res.status} for query: "${topic.query}"`);
+  }
+
+  const data = await res.json();
+  return (data.hits || []) as AlgoliaHit[];
+}
+
 export interface FetchTrendingOptions {
   allowHistorical?: boolean;
 }
 
-async function fetchHackerNewsTrendingInternal(allowHistorical: boolean): Promise<TrendingItem[]> {
+/** Max concurrent outgoing requests to HN Algolia API */
+const HN_FETCH_CONCURRENCY = 6;
+
+async function fetchHackerNewsTrendingInternal(): Promise<TrendingItem[]> {
+  const nowMs = Date.now();
+  if (inMemoryCache && nowMs - inMemoryCache.timestamp < CACHE_TTL_MS && inMemoryCache.data.length > 0) {
+    return inMemoryCache.data;
+  }
+
   try {
-    const now = Math.floor(Date.now() / 1000);
+    const now = Math.floor(nowMs / 1000);
     const sevenDaysAgo = now - 7 * 86400;
-    // allowHistorical passed as parameter
 
     const seenIds = new Set<string>();
     const items: TrendingItem[] = [];
 
-    // 1. Primary fresh query pool (strict 7-day window)
-    for (const topic of FRESH_TOPIC_QUERIES) {
-      try {
-        const endpoint = `https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(
-          topic.query
-        )}&tags=story&numericFilters=points>${topic.minScore},created_at_i>${sevenDaysAgo}&hitsPerPage=${topic.hits}`;
+    // Run both fresh queries and historical queries concurrently with bounded concurrency
+    const allQueryTasks = [
+      ...FRESH_TOPIC_QUERIES.map((topic) => ({ topic, minTimestamp: sevenDaysAgo, isHistorical: false })),
+      ...HISTORICAL_TOPIC_QUERIES.map((topic) => ({ topic, minTimestamp: undefined, isHistorical: true })),
+    ];
 
-        const res = await fetch(endpoint, {
-          headers: { Accept: "application/json" },
-          next: { revalidate: 3600 },
+    const results = await runWithConcurrencyLimit(
+      allQueryTasks,
+      (task) => fetchSingleTopicQuery(task.topic, task.minTimestamp),
+      HN_FETCH_CONCURRENCY
+    );
+
+    for (let i = 0; i < results.length; i++) {
+      const settled = results[i];
+      if (settled.status === "rejected") {
+        console.warn(
+          `[fetchHackerNews] Sub-query failed for "${allQueryTasks[i]?.topic.query}":`,
+          settled.reason
+        );
+        continue;
+      }
+
+      const hits = settled.value;
+      const isHistorical = allQueryTasks[i]?.isHistorical;
+
+      for (const hit of hits) {
+        if (!hit.objectID || !hit.title || seenIds.has(hit.objectID)) continue;
+        if (!isHistorical && hit.created_at_i && hit.created_at_i < sevenDaysAgo) continue;
+
+        seenIds.add(hit.objectID);
+
+        const itemUrl = hit.url || `https://news.ycombinator.com/item?id=${hit.objectID}`;
+        const points = hit.points || 0;
+        const comments = hit.num_comments || 0;
+        const publishedAt = hit.created_at || new Date().toISOString();
+        const publishedUnix = hit.created_at_i || Math.floor(new Date(publishedAt).getTime() / 1000);
+        const tScore = calculateTrendingScore(points, publishedUnix, now);
+
+        items.push({
+          source: "Hacker News",
+          external_id: hit.objectID,
+          name: hit.title,
+          url: itemUrl,
+          tagline: `${points} points & ${comments} comments by ${hit.author || "founder"} on Hacker News`,
+          category: inferHNCategory(hit.title),
+          score: points,
+          trending_score: tScore,
+          fetched_at: publishedAt,
+          published_at: publishedAt,
         });
-
-        if (!res.ok) continue;
-
-        const data = await res.json();
-        const hits = data.hits || [];
-
-        for (const hit of hits) {
-          if (!hit.objectID || !hit.title || seenIds.has(hit.objectID)) continue;
-          if (hit.created_at_i && hit.created_at_i < sevenDaysAgo) continue;
-
-          seenIds.add(hit.objectID);
-
-          const itemUrl = hit.url || `https://news.ycombinator.com/item?id=${hit.objectID}`;
-          const points = hit.points || 0;
-          const comments = hit.num_comments || 0;
-          const publishedAt = hit.created_at || new Date().toISOString();
-          const publishedUnix = hit.created_at_i || Math.floor(new Date(publishedAt).getTime() / 1000);
-          const tScore = calculateTrendingScore(points, publishedUnix, now);
-
-          items.push({
-            source: "Hacker News",
-            external_id: hit.objectID,
-            name: hit.title,
-            url: itemUrl,
-            tagline: `${points} points & ${comments} comments by ${hit.author || "founder"} on Hacker News`,
-            category: inferHNCategory(hit.title),
-            score: points,
-            trending_score: tScore,
-            fetched_at: publishedAt,
-            published_at: publishedAt,
-          });
-        }
-      } catch (subErr) {
-        console.warn("[fetchHackerNews] Sub-query error for topic:", topic.query, subErr);
       }
     }
 
-    // 2. If historical items are allowed (for Most Upvoted mode), query all-time top stories
-    if (allowHistorical) {
-      for (const topic of HISTORICAL_TOPIC_QUERIES) {
-        try {
-          const endpoint = `https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(
-            topic.query
-          )}&tags=story&numericFilters=points>${topic.minScore}&hitsPerPage=${topic.hits}`;
-
-          const res = await fetch(endpoint, {
-            headers: { Accept: "application/json" },
-            next: { revalidate: 3600 },
-          });
-
-          if (!res.ok) continue;
-
-          const data = await res.json();
-          const hits = data.hits || [];
-
-          for (const hit of hits) {
-            if (!hit.objectID || !hit.title || seenIds.has(hit.objectID)) continue;
-
-            seenIds.add(hit.objectID);
-
-            const itemUrl = hit.url || `https://news.ycombinator.com/item?id=${hit.objectID}`;
-            const points = hit.points || 0;
-            const comments = hit.num_comments || 0;
-            const publishedAt = hit.created_at || new Date().toISOString();
-            const publishedUnix = hit.created_at_i || Math.floor(new Date(publishedAt).getTime() / 1000);
-            const tScore = calculateTrendingScore(points, publishedUnix, now);
-
-            items.push({
-              source: "Hacker News",
-              external_id: hit.objectID,
-              name: hit.title,
-              url: itemUrl,
-              tagline: `${points} points & ${comments} comments by ${hit.author || "founder"} on Hacker News`,
-              category: inferHNCategory(hit.title),
-              score: points,
-              trending_score: tScore,
-              fetched_at: publishedAt,
-              published_at: publishedAt,
-            });
-          }
-        } catch (subErr) {
-          console.warn("[fetchHackerNews] Historical sub-query error:", topic.query, subErr);
-        }
-      }
+    if (items.length > 0) {
+      inMemoryCache = {
+        data: items,
+        timestamp: nowMs,
+      };
     }
 
     return items;
   } catch (err) {
     console.error("[fetchHackerNews] Error fetching HN trending items:", err);
-    return [];
+    return inMemoryCache?.data || [];
   }
 }
 
-
-const getRawHNTrendingCached = cache(async (allowHistorical: boolean): Promise<TrendingItem[]> => {
-  return fetchHackerNewsTrendingInternal(allowHistorical);
+const getRawHNTrendingCached = cache(async (): Promise<TrendingItem[]> => {
+  return fetchHackerNewsTrendingInternal();
 });
 
-export async function fetchHackerNewsTrending(options?: FetchTrendingOptions): Promise<TrendingItem[]> {
-  const allowHistorical = Boolean(options?.allowHistorical);
-  return getRawHNTrendingCached(allowHistorical);
+export async function fetchHackerNewsTrending(): Promise<TrendingItem[]> {
+  return getRawHNTrendingCached();
 }

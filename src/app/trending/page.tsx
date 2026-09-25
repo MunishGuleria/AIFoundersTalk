@@ -71,7 +71,7 @@ export default async function TrendingPage(props: TrendingPageProps) {
     const q = new URLSearchParams();
     if (source && source !== "all") q.set("source", source);
     if (category && category !== "all") q.set("category", category);
-    if (sort && sort !== "score") q.set("sort", sort);
+    if (sort && sort !== "trending") q.set("sort", sort);
     if (page && page > 1) q.set("page", String(page));
 
     const qs = q.toString();
@@ -130,12 +130,12 @@ export default async function TrendingPage(props: TrendingPageProps) {
         <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs mb-10 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
             <div className="flex flex-wrap items-center gap-2 font-sans">
-              <span className="text-xs font-medium text-slate-400 mr-1">Source:</span>
+              <span className="text-xs font-medium text-slate-600 mr-1">Source:</span>
               <Link
                 href={buildQueryUrl({ source: "all", page: 1 })}
                 className={`text-xs px-3 py-1.5 rounded-md transition-all no-underline ${
                   activeSource === "all"
-                    ? "bg-slate-900 text-white font-semibold"
+                    ? "bg-slate-900 !text-white font-semibold"
                     : "bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100"
                 }`}
               >
@@ -145,7 +145,7 @@ export default async function TrendingPage(props: TrendingPageProps) {
                 href={buildQueryUrl({ source: "hacker-news", page: 1 })}
                 className={`text-xs px-3 py-1.5 rounded-md transition-all no-underline ${
                   activeSource === "hacker-news"
-                    ? "bg-slate-900 text-white font-semibold"
+                    ? "bg-slate-900 !text-white font-semibold"
                     : "bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100"
                 }`}
               >
@@ -181,7 +181,7 @@ export default async function TrendingPage(props: TrendingPageProps) {
           </div>
 
           <div className="flex flex-wrap items-center gap-2 font-sans">
-            <span className="text-xs font-medium text-slate-400 mr-1">Topics:</span>
+            <span className="text-xs font-medium text-slate-600 mr-1">Topics:</span>
             <Link
               href={buildQueryUrl({ category: "all", page: 1 })}
               className={`text-xs px-3 py-1 rounded-full transition-all no-underline ${
@@ -210,12 +210,12 @@ export default async function TrendingPage(props: TrendingPageProps) {
 
         {items.length === 0 ? (
           <div className="p-16 text-center bg-white rounded-2xl border border-slate-200 shadow-2xs mb-12">
-            <h3
+            <h2
               className="text-lg font-bold text-slate-900 mb-2"
               style={{ fontFamily: "var(--font-serif)" }}
             >
               No trending items found
-            </h3>
+            </h2>
             <p className="text-sm text-slate-500 max-w-md mx-auto mb-6 font-sans">
               No live discussions match the selected filters.
             </p>

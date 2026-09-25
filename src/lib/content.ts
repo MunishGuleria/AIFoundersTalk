@@ -56,6 +56,8 @@ export interface ContentItem {
 
 const MIN_WORD_COUNT = 800;
 const MIN_CITATIONS = 1;
+/** Per-process Set to suppress duplicate quality-gate warnings */
+const qualityGateWarnedSlugs = new Set<string>();
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
 
@@ -94,7 +96,8 @@ export function getContentBySlug(
   }
 
   const citations: Citation[] = data.citations || [];
-  if (citations.length < MIN_CITATIONS) {
+  if (citations.length < MIN_CITATIONS && !qualityGateWarnedSlugs.has(cacheKey)) {
+    qualityGateWarnedSlugs.add(cacheKey);
     console.warn(
       "[Quality Gate Warning] " + slug + " has " + citations.length + " citations (minimum: " + MIN_CITATIONS + ")"
     );
@@ -277,28 +280,39 @@ export async function getTrendingDataset(
   const offset = options?.offset || 0;
 
   try {
-    const isHistoricalAllowed = sortBy === 'score';
-    const rawItems = await fetchHackerNewsTrending({ allowHistorical: isHistoricalAllowed });
+    const rawItems = await fetchHackerNewsTrending();
+    const now = Math.floor(Date.now() / 1000);
+    const sevenDaysAgo = now - 7 * 86400;
+
     let filtered = rawItems;
 
     if (category) {
       filtered = filtered.filter((item) => item.category === category);
     }
 
-    const totalCount = filtered.length;
-
     if (sortBy === 'recent') {
-      filtered = [...filtered].sort(
-        (a, b) =>
-          new Date(b.published_at || b.fetched_at || 0).getTime() -
-          new Date(a.published_at || a.fetched_at || 0).getTime()
-      );
+      filtered = filtered
+        .filter((item) => {
+          const pubUnix = Math.floor(new Date(item.published_at || item.fetched_at || 0).getTime() / 1000);
+          return pubUnix >= sevenDaysAgo;
+        })
+        .sort(
+          (a, b) =>
+            new Date(b.published_at || b.fetched_at || 0).getTime() -
+            new Date(a.published_at || a.fetched_at || 0).getTime()
+        );
     } else if (sortBy === 'score') {
       filtered = [...filtered].sort((a, b) => b.score - a.score);
     } else {
-      filtered = [...filtered].sort((a, b) => (b.trending_score || 0) - (a.trending_score || 0));
+      filtered = filtered
+        .filter((item) => {
+          const pubUnix = Math.floor(new Date(item.published_at || item.fetched_at || 0).getTime() / 1000);
+          return pubUnix >= sevenDaysAgo;
+        })
+        .sort((a, b) => (b.trending_score || 0) - (a.trending_score || 0));
     }
 
+    const totalCount = filtered.length;
     const items = filtered.slice(offset, offset + limit);
 
     return { items, totalCount };

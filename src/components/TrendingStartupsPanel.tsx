@@ -118,7 +118,7 @@ export function TrendingStartupsPanel({
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredItems.map((item, idx) => (
-            <TrendingCard key={`${item.source}-${item.external_id}-${idx}`} item={item} />
+            <TrendingCard key={`${item.source}-${item.external_id}-${idx}`} item={item} headingLevel="h3" />
           ))}
         </div>
       )}

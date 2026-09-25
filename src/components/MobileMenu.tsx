@@ -55,9 +55,10 @@ export function MobileMenu() {
       {/* Slide-Down Mobile/Tablet Drawer Menu */}
       <div
         id="mobile-menu-drawer"
-        className={`fixed top-16 left-0 right-0 max-h-[calc(100vh-4rem)] border-b lg:hidden shadow-xl bg-white/98 backdrop-blur-md z-40 overflow-y-auto transition-all duration-200 ease-in-out transform ${          isOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-2 pointer-events-none"        }`}
+        className={`fixed top-16 left-0 right-0 max-h-[calc(100vh-4rem)] border-b lg:hidden shadow-xl bg-white/98 backdrop-blur-md z-40 overflow-y-auto transition-all duration-200 ease-in-out transform ${          isOpen ? "opacity-100 translate-y-0 pointer-events-auto visible" : "opacity-0 -translate-y-2 pointer-events-none invisible"        }`}
         style={{ borderColor: "var(--border)" }}
         aria-hidden={!isOpen}
+        inert={!isOpen ? true : undefined}
       >
         <div className="container-wide py-4 flex flex-col gap-2.5">
           {/* Mobile / Tablet Full-Width Search Bar */}

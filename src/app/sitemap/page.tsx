@@ -59,25 +59,22 @@ export default function SitemapPage() {
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 text-sm font-sans">
               <Link href="/" className="text-slate-900 hover:text-blue-600 no-underline font-medium p-2 rounded hover:bg-slate-50 transition-colors">
-                Homepage
+                Home
               </Link>
               <Link href="/articles" className="text-slate-900 hover:text-blue-600 no-underline font-medium p-2 rounded hover:bg-slate-50 transition-colors">
-                AI Articles
+                Articles
               </Link>
               <Link href="/interviews" className="text-slate-900 hover:text-blue-600 no-underline font-medium p-2 rounded hover:bg-slate-50 transition-colors">
-                AI Founder Talks
+                Founder Talks
               </Link>
               <Link href="/resources" className="text-slate-900 hover:text-blue-600 no-underline font-medium p-2 rounded hover:bg-slate-50 transition-colors">
-                AI Resources &amp; Guides
+                Resources
               </Link>
               <Link href="/trending" className="text-slate-900 hover:text-blue-600 no-underline font-medium p-2 rounded hover:bg-slate-50 transition-colors">
-                AI &amp; Startup Trending
-              </Link>
-              <Link href="/trending/hacker-news" className="text-slate-900 hover:text-blue-600 no-underline font-medium p-2 rounded hover:bg-slate-50 transition-colors">
-                Hacker News Trending
+                Trending
               </Link>
               <Link href="/about" className="text-slate-900 hover:text-blue-600 no-underline font-medium p-2 rounded hover:bg-slate-50 transition-colors">
-                About Us
+                About
               </Link>
               <Link href="/newsletter" className="text-slate-900 hover:text-blue-600 no-underline font-medium p-2 rounded hover:bg-slate-50 transition-colors">
                 Newsletter
@@ -192,10 +189,8 @@ export default function SitemapPage() {
             <h2 className="text-lg font-bold text-slate-900 mb-4 border-b border-slate-100 pb-2">
               Trust, Editorial Policy &amp; Legal
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm font-sans">
-              <Link href="/about" className="text-slate-900 hover:text-blue-600 no-underline font-medium p-2 rounded hover:bg-slate-50 transition-colors">
-                About AI Founders Talk
-              </Link>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm font-sans">
+
               <Link href="/editorial-policy" className="text-slate-900 hover:text-blue-600 no-underline font-medium p-2 rounded hover:bg-slate-50 transition-colors">
                 Editorial Policy
               </Link>

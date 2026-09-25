@@ -176,6 +176,7 @@ export default async function InterviewDetailPage({ params }: PageProps) {
                   width={1200}
                   height={675}
                   priority
+                  sizes="(max-width: 1024px) 100vw, 900px"
                   className="w-full h-auto object-cover"
                 />
               </div>

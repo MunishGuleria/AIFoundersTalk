@@ -3,7 +3,13 @@ import Image from "next/image";
 import { ContentMeta } from "@/lib/content";
 import { getPillar } from "@/lib/taxonomy";
 
-export function ArticleCard({ article }: { article: ContentMeta }) {
+export function ArticleCard({
+  article,
+  headingLevel: Heading = "h2",
+}: {
+  article: ContentMeta;
+  headingLevel?: "h2" | "h3";
+}) {
   const pillar = getPillar(article.pillar);
   const section =
     article.type === "article"
@@ -26,6 +32,7 @@ export function ArticleCard({ article }: { article: ContentMeta }) {
               alt={altText}
               width={640}
               height={360}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
               className="w-full h-full object-cover"
             />
           </div>
@@ -40,14 +47,14 @@ export function ArticleCard({ article }: { article: ContentMeta }) {
           )}
 
           {/* Title */}
-          <h3
+          <Heading
             className="text-base font-bold leading-snug mb-2 transition-colors mt-2 text-slate-900 group-hover:text-slate-600"
             style={{
               fontFamily: "var(--font-serif)",
             }}
           >
             {article.title}
-          </h3>
+          </Heading>
 
           {/* Excerpt */}
           <p
@@ -101,6 +108,7 @@ export function ArticleCardHero({ article }: { article: ContentMeta }) {
               alt={altText}
               width={800}
               height={450}
+              sizes="(max-width: 768px) 100vw, 50vw"
               className="w-full h-full object-cover"
               priority
             />

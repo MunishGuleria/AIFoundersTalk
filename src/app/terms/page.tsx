@@ -35,7 +35,7 @@ export default function TermsPage() {
 
         <div className="prose">
           <p className="text-sm text-gray-500 mb-6">
-            Last updated: February 15, 2026
+            Last updated: September 25, 2026
           </p>
 
           <h2>1. Acceptance of Terms</h2>

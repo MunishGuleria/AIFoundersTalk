@@ -90,7 +90,7 @@ export default async function TrendingSourcePage({ params, searchParams }: Sourc
     page: p = 1,
   }: { sort?: string; category?: string; page?: number } = {}) {
     const q = new URLSearchParams();
-    if (so && so !== "score") q.set("sort", so);
+    if (so && so !== "trending") q.set("sort", so);
     if (c && c !== "all") q.set("category", c);
     if (p && p > 1) q.set("page", String(p));
 
@@ -156,7 +156,7 @@ export default async function TrendingSourcePage({ params, searchParams }: Sourc
         <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs mb-10 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-2 font-sans">
-              <span className="text-xs font-medium text-slate-400 mr-1">Topics:</span>
+              <span className="text-xs font-medium text-slate-600 mr-1">Topics:</span>
               <Link
                 href={buildQueryUrl({ category: "all", page: 1 })}
                 className={`text-xs px-3 py-1.5 rounded-md transition-all no-underline ${
@@ -213,12 +213,12 @@ export default async function TrendingSourcePage({ params, searchParams }: Sourc
         {/* Grid of Items */}
         {items.length === 0 ? (
           <div className="p-16 text-center bg-white rounded-2xl border border-slate-200 shadow-2xs mb-12">
-            <h3
+            <h2
               className="text-lg font-bold text-slate-900 mb-2"
               style={{ fontFamily: "var(--font-serif)" }}
             >
               No {config.label} items found
-            </h3>
+            </h2>
             <p className="text-sm text-slate-500 max-w-md mx-auto mb-6 font-sans">
               No live discussions match the selected topic filter.
             </p>

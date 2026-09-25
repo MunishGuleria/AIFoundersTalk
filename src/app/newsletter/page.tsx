@@ -96,17 +96,17 @@ export default async function NewsletterPage(props: {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center border-t border-slate-200 pt-8">
           <div className="p-4">
             <div className="text-2xl mb-2">⚡</div>
-            <h3 className="font-bold text-sm text-slate-900 mb-1">Honest Tool Tests</h3>
+            <h2 className="font-bold text-sm text-slate-900 mb-1">Honest Tool Tests</h2>
             <p className="text-xs text-slate-500">We test new AI tools so you know exactly which ones are worth your money.</p>
           </div>
           <div className="p-4">
             <div className="text-2xl mb-2">💡</div>
-            <h3 className="font-bold text-sm text-slate-900 mb-1">Real Founder Lessons</h3>
+            <h2 className="font-bold text-sm text-slate-900 mb-1">Real Founder Lessons</h2>
             <p className="text-xs text-slate-500">Learn the exact workflows and tactics other businesses use to grow faster.</p>
           </div>
           <div className="p-4">
             <div className="text-2xl mb-2">🔍</div>
-            <h3 className="font-bold text-sm text-slate-900 mb-1">Search &amp; Visibility</h3>
+            <h2 className="font-bold text-sm text-slate-900 mb-1">Search &amp; Visibility</h2>
             <p className="text-xs text-slate-500">Simple ways to get your website recommended when people search with AI.</p>
           </div>
         </div>

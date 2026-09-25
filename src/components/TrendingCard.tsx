@@ -3,9 +3,10 @@ import { TrendingItem } from "@/lib/fetchHackerNews";
 
 interface TrendingCardProps {
   item: TrendingItem;
+  headingLevel?: "h2" | "h3";
 }
 
-export function TrendingCard({ item }: TrendingCardProps) {
+export function TrendingCard({ item, headingLevel: Heading = "h2" }: TrendingCardProps) {
   const hnDiscussionUrl = `https://news.ycombinator.com/item?id=${item.external_id}`;
 
   const hasExternalArticle =
@@ -40,7 +41,7 @@ export function TrendingCard({ item }: TrendingCardProps) {
         </div>
 
         {/* Story Title */}
-        <h3
+        <Heading
           className="text-base font-bold leading-snug mb-2 text-slate-900 group-hover:text-slate-700 transition-colors"
           style={{ fontFamily: "var(--font-serif)" }}
         >
@@ -52,7 +53,7 @@ export function TrendingCard({ item }: TrendingCardProps) {
           >
             {item.name}
           </a>
-        </h3>
+        </Heading>
 
         {/* Score & Comments */}
         <p className="text-xs font-semibold text-slate-500 mb-3 font-sans">
