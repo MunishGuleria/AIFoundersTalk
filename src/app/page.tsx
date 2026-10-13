@@ -12,7 +12,7 @@ export default async function HomePage() {
   const featured = getAllContentMixed({ featured: true, limit: 1 });
   const latest = getAllContentMixed({ limit: 6 });
   let trendingStartups: import("@/lib/fetchHackerNews").TrendingItem[] = [];
-  
+
   try {
     trendingStartups = await getTrendingItems({ limit: 6, sortBy: "trending" });
   } catch (err) {
@@ -135,7 +135,7 @@ export default async function HomePage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               {latest.map((article) => (
-                <ArticleCard key={article.slug} article={article} headingLevel="h3" />
+                <ArticleCard key={article.slug} article={article} />
               ))}
             </div>
 
@@ -156,7 +156,7 @@ export default async function HomePage() {
         <TrendingStartupsPanel initialItems={trendingStartups} isCompactPreview={true} previewLimit={6} />
       </section>
 
-      
+
 
       {/* ─── Featured Pillar Block ─── */}
       <section className="py-12 bg-white border-t border-b border-slate-200">
@@ -215,5 +215,6 @@ export default async function HomePage() {
       {/* ─── Newsletter Join Strip (Positioned at bottom of page) ─── */}
       <NewsletterStrip />
     </>
+
   );
 }
