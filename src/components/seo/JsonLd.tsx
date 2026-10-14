@@ -1,14 +1,14 @@
 import { ContentMeta } from "@/lib/content";
 import { absoluteUrl } from "@/lib/siteUrl";
 
-const ORGANIZATION_ID = absoluteUrl("/#organization");
-const WEBSITE_ID = absoluteUrl("/#website");
+export const getOrganizationId = () => absoluteUrl("/#organization");
+export const getWebsiteId = () => absoluteUrl("/#website");
 
 export function OrganizationJsonLd() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "@id": ORGANIZATION_ID,
+    "@id": getOrganizationId(),
     name: "AI Founders Talk",
     url: absoluteUrl("/"),
     logo: {
@@ -19,7 +19,6 @@ export function OrganizationJsonLd() {
     },
     description:
       "Interviews, analysis, and tactical insights from AI founders and revenue leaders.",
-    sameAs: [],
   };
 
   return (
@@ -36,21 +35,13 @@ export function WebSiteJsonLd() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "@id": WEBSITE_ID,
+    "@id": getWebsiteId(),
     name: "AI Founders Talk",
     url: absoluteUrl("/"),
     description:
       "Interviews, analysis, and tactical insights from AI founders and revenue leaders.",
     publisher: {
-      "@id": ORGANIZATION_ID,
-    },
-    potentialAction: {
-      "@type": "SearchAction",
-      target: {
-        "@type": "EntryPoint",
-        urlTemplate: `${absoluteUrl("/articles")}?search={search_term_string}`,
-      },
-      "query-input": "required name=search_term_string",
+      "@id": getOrganizationId(),
     },
   };
 
@@ -81,26 +72,42 @@ export function ArticleJsonLd({
         : "resources";
   const url = absoluteUrl(`/${section}/${article.slug}`);
 
+  const isOrgAuthor =
+    !authorName ||
+    authorName.toLowerCase().includes("editorial") ||
+    authorName.toLowerCase().includes("team");
+
+  const authorObj = isOrgAuthor
+    ? {
+        "@type": "Organization",
+        name: authorName || "AI Founders Talk Editorial",
+        url: absoluteUrl("/about"),
+      }
+    : {
+        "@type": "Person",
+        name: authorName,
+        url: absoluteUrl("/about"),
+      };
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": type,
     "@id": `${url}#${type.toLowerCase()}`,
     isPartOf: {
-      "@id": WEBSITE_ID,
+      "@id": getWebsiteId(),
     },
     headline: article.title,
     description: article.excerpt,
-    author: authorName
-      ? {
-          "@type": "Person",
-          name: authorName,
-          url: absoluteUrl("/about"),
-        }
-      : {
-          "@id": ORGANIZATION_ID,
-        },
+    author: authorObj,
     publisher: {
-      "@id": ORGANIZATION_ID,
+      "@type": "Organization",
+      "@id": getOrganizationId(),
+      name: "AI Founders Talk",
+      url: absoluteUrl("/"),
+      logo: {
+        "@type": "ImageObject",
+        url: absoluteUrl("/icon.svg"),
+      },
     },
     datePublished: article.publishedAt,
     dateModified: article.updatedAt || article.publishedAt,
@@ -110,9 +117,11 @@ export function ArticleJsonLd({
       "@id": url,
     },
     ...(article.coverImage && {
-      image: article.coverImage.startsWith("http")
-        ? article.coverImage
-        : absoluteUrl(article.coverImage),
+      image: [
+        article.coverImage.startsWith("http")
+          ? article.coverImage
+          : absoluteUrl(article.coverImage),
+      ],
     }),
     wordCount: article.wordCount,
     keywords: article.tags ? article.tags.join(", ") : undefined,
@@ -127,6 +136,7 @@ export function ArticleJsonLd({
     />
   );
 }
+
 
 export function WebPageJsonLd({
   title,
@@ -149,10 +159,10 @@ export function WebPageJsonLd({
     name: title,
     description,
     isPartOf: {
-      "@id": WEBSITE_ID,
+      "@id": getWebsiteId(),
     },
     publisher: {
-      "@id": ORGANIZATION_ID,
+      "@id": getOrganizationId(),
     },
   };
 

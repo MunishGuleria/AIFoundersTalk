@@ -63,13 +63,15 @@ export function MobileMenu() {
         <div className="container-wide py-4 flex flex-col gap-2.5">
           {/* Mobile / Tablet Full-Width Search Bar */}
           <div className="w-full pb-3 border-b border-slate-100">
-            <SearchBar
-              isAlwaysExpanded={true}
-              autoFocus={true}
-              fullWidth={true}
-              onNavigate={() => setIsOpen(false)}
-              placeholder="Search articles, founder talks, guides..."
-            />
+            {isOpen && (
+              <SearchBar
+                isAlwaysExpanded={true}
+                autoFocus={true}
+                fullWidth={true}
+                onNavigate={() => setIsOpen(false)}
+                placeholder="Search articles, founder talks, guides..."
+              />
+            )}
           </div>
 
           {/* Navigation Links */}

@@ -4,8 +4,14 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { absoluteUrl } from "@/lib/siteUrl";
 
 export const metadata: Metadata = {
-  title: "Terms of Service | AI Founders Talk",
+  title: "Terms of Service",
   description: "Terms and conditions governing the use of AI Founders Talk.",
+  openGraph: {
+    type: "website",
+    title: "Terms of Service | AI Founders Talk",
+    description: "Terms and conditions governing the use of AI Founders Talk.",
+    url: absoluteUrl("/terms"),
+  },
   alternates: {
     canonical: absoluteUrl("/terms"),
   },

@@ -5,9 +5,16 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { absoluteUrl } from "@/lib/siteUrl";
 
 export const metadata: Metadata = {
-  title: "About Us | AI Founders Talk",
+  title: "About Us",
   description:
     "AI Founders Talk is a plain-English guide helping business owners, founders, and everyday professionals understand and use AI with zero confusion.",
+  openGraph: {
+    type: "website",
+    title: "About Us | AI Founders Talk",
+    description:
+      "AI Founders Talk is a plain-English guide helping business owners, founders, and everyday professionals understand and use AI with zero confusion.",
+    url: absoluteUrl("/about"),
+  },
   alternates: {
     canonical: absoluteUrl("/about"),
   },

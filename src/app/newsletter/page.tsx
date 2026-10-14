@@ -5,9 +5,16 @@ import { BreadcrumbJsonLd, WebPageJsonLd } from "@/components/seo/JsonLd";
 import { absoluteUrl } from "@/lib/siteUrl";
 
 export const metadata: Metadata = {
-  title: "Join the Newsletter | AI Founders Talk",
+  title: "Join the Newsletter",
   description:
     "Get one practical, plain-English AI guide in your inbox every week. Honest tool reviews, real founder stories, and zero fluff.",
+  openGraph: {
+    type: "website",
+    title: "Join the Newsletter | AI Founders Talk",
+    description:
+      "Get one practical, plain-English AI guide in your inbox every week. Honest tool reviews, real founder stories, and zero fluff.",
+    url: absoluteUrl("/newsletter"),
+  },
   alternates: {
     canonical: absoluteUrl("/newsletter"),
   },

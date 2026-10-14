@@ -1,73 +1,112 @@
-import { getSiteUrl, absoluteUrl } from "../src/lib/siteUrl";
+import { getSiteUrl, absoluteUrl, CANONICAL_SITE_URL } from "../src/lib/siteUrl";
 import { generateArticleMetadata } from "../src/lib/metadata";
 import robotsDefault from "../src/app/robots";
 import sitemapDefault from "../src/app/sitemap";
 import { GET as getLlmsTxt } from "../src/app/llms.txt/route";
 import { getContentBySlug } from "../src/lib/content";
 
+function assert(condition: boolean, message: string) {
+  if (!condition) {
+    console.error(`❌ FAILED ASSERTION: ${message}`);
+    process.exit(1);
+  }
+  console.log(`  ✓ ${message}`);
+}
+
 async function run() {
-  console.log("=== 1. DEFAULT LOCAL DEV SIMULATION (no env var) ===");
+  console.log("=== 1. LOCAL DEV SIMULATION (NEXT_PUBLIC_SITE_URL=http://localhost:3000) ===");
+  const env = process.env as Record<string, string | undefined>;
+  env.NODE_ENV = "development";
+  process.env.NEXT_PUBLIC_SITE_URL = "http://localhost:3000";
+
+  assert(getSiteUrl() === "http://localhost:3000", "Localhost URL preserved in development");
+  assert(absoluteUrl("/") === "http://localhost:3000", "Root URL resolves without trailing slash");
+  assert(absoluteUrl("/articles") === "http://localhost:3000/articles", "Subpaths resolve correctly on localhost");
+
   delete process.env.NEXT_PUBLIC_SITE_URL;
-  delete process.env.VERCEL_URL;
+  assert(getSiteUrl() === "http://localhost:3000", "Defaults to http://localhost:3000 when env var unset in development");
 
-  console.log("Base Site URL:", getSiteUrl());
-  console.log("Absolute /articles URL:", absoluteUrl("/articles"));
+  console.log("\n=== 2. PRODUCTION HARDENING SIMULATION (Adversarial HTTP / Apex Env Var) ===");
+  env.NODE_ENV = "production";
+  process.env.NEXT_PUBLIC_SITE_URL = "http://aifounderstalk.com"; // Adversarial / misconfigured env var
 
+  assert(getSiteUrl() === CANONICAL_SITE_URL, "Production enforces canonical HTTPS origin despite HTTP env var");
+  assert(absoluteUrl("/") === CANONICAL_SITE_URL, "Production root URL is canonical HTTPS with no trailing slash");
+  assert(absoluteUrl("/articles") === `${CANONICAL_SITE_URL}/articles`, "Production subpaths use canonical HTTPS");
+  assert(
+    absoluteUrl("http://www.aifounderstalk.com/articles/test") === `${CANONICAL_SITE_URL}/articles/test`,
+    "Upgrades incoming HTTP production URLs to HTTPS"
+  );
+  assert(
+    absoluteUrl("http://aifounderstalk.com/about") === `${CANONICAL_SITE_URL}/about`,
+    "Upgrades incoming apex HTTP production URLs to canonical HTTPS"
+  );
+
+  console.log("\n=== 3. ROBOTS.TXT VERIFICATION ===");
+  const robotsData = robotsDefault();
+  assert(
+    robotsData.sitemap === "https://www.aifounderstalk.com/sitemap.xml",
+    "robots.txt advertises exact canonical HTTPS sitemap URL"
+  );
+  const rules = Array.isArray(robotsData.rules) ? robotsData.rules : [robotsData.rules];
+  const starRule = rules.find((r) => r.userAgent === "*");
+  assert(Boolean(starRule && starRule.allow === "/" && Array.isArray(starRule.disallow) && starRule.disallow.includes("/api/")), "robots.txt allows editorial pages and disallows /api/");
+
+  console.log("\n=== 4. XML SITEMAP VERIFICATION ===");
+  const sitemapData = sitemapDefault();
+  assert(sitemapData.length >= 20, `Sitemap contains all indexable pages (found ${sitemapData.length} items)`);
+
+  // Check every URL in sitemap
+  for (const entry of sitemapData) {
+    assert(
+      entry.url.startsWith("https://www.aifounderstalk.com"),
+      `Sitemap URL uses canonical origin: ${entry.url}`
+    );
+    assert(!entry.url.includes("http://"), `Sitemap URL contains no HTTP: ${entry.url}`);
+    assert(!entry.url.includes("localhost"), `Sitemap URL contains no localhost: ${entry.url}`);
+    assert(!entry.url.endsWith("/"), `Sitemap URL has no unwanted trailing slash: ${entry.url}`);
+
+    if (entry.lastModified) {
+      const d = new Date(entry.lastModified);
+      assert(!isNaN(d.getTime()), `Valid lastModified date for ${entry.url}: ${d.toISOString()}`);
+    }
+  }
+
+  // Ensure root homepage is present
+  const homeEntry = sitemapData.find((s) => s.url === "https://www.aifounderstalk.com");
+  assert(Boolean(homeEntry), "Homepage https://www.aifounderstalk.com exists in sitemap");
+
+  // Ensure article pages are present
+  const articleEntry = sitemapData.find((s) => s.url.includes("revops-ai-performance-gap-2026"));
+  assert(Boolean(articleEntry && articleEntry.lastModified), "Published article present with real lastModified date");
+
+  console.log("\n=== 5. METADATA & LLMS.TXT VERIFICATION ===");
   const articleData = getContentBySlug("articles", "revops-ai-performance-gap-2026");
   if (articleData) {
-    const meta = generateArticleMetadata(articleData.meta);
-    console.log("Canonical Meta URL:", meta.alternates?.canonical);
-    console.log("OG URL:", meta.openGraph?.url);
-    if (meta.openGraph && "images" in meta.openGraph) {
-      console.log("OG Image URL:", meta.openGraph.images);
-    }
-  }
-
-  const robotsData = robotsDefault();
-  console.log("Robots Sitemap:", robotsData.sitemap);
-
-  const sitemapData = sitemapDefault();
-  console.log("Sitemap sample [0]:", sitemapData[0].url);
-  console.log("Sitemap sample [1]:", sitemapData[1].url);
-  console.log("Sitemap sample article:", sitemapData.find(s => s.url.includes("revops-ai-performance-gap-2026"))?.url);
-
-  const llmsRes = await getLlmsTxt();
-  const llmsText = await llmsRes.text();
-  console.log("llms.txt sample links:", llmsText.split("\n").filter(l => l.includes("http")).slice(0, 3));
-
-  console.log("\n=== 2. PRODUCTION SIMULATION (NEXT_PUBLIC_SITE_URL=https://www.aifounderstalk.com) ===");
-  process.env.NEXT_PUBLIC_SITE_URL = "https://www.aifounderstalk.com";
-
-  console.log("Prod Base Site URL:", getSiteUrl());
-  console.log("Prod Absolute /articles URL:", absoluteUrl("/articles"));
-
-  if (articleData) {
     const metaProd = generateArticleMetadata(articleData.meta);
-    console.log("Prod Canonical Meta URL:", metaProd.alternates?.canonical);
-    console.log("Prod OG URL:", metaProd.openGraph?.url);
-    if (metaProd.openGraph && "images" in metaProd.openGraph) {
-      console.log("Prod OG Image URL:", metaProd.openGraph.images);
-    }
+    assert(
+      metaProd.alternates?.canonical === `${CANONICAL_SITE_URL}/articles/revops-ai-performance-gap-2026`,
+      "Article canonical URL is canonical HTTPS"
+    );
+    assert(
+      metaProd.openGraph?.url === `${CANONICAL_SITE_URL}/articles/revops-ai-performance-gap-2026`,
+      "Article OG URL matches canonical"
+    );
   }
-
-  const robotsProd = robotsDefault();
-  console.log("Prod Robots Sitemap:", robotsProd.sitemap);
-
-  const sitemapProd = sitemapDefault();
-  console.log("Prod Sitemap sample [0]:", sitemapProd[0].url);
-  console.log("Prod Sitemap sample [1]:", sitemapProd[1].url);
-  console.log("Prod Sitemap sample article:", sitemapProd.find(s => s.url.includes("revops-ai-performance-gap-2026"))?.url);
 
   const llmsProdRes = await getLlmsTxt();
   const llmsProdText = await llmsProdRes.text();
-  console.log("Prod llms.txt sample links:", llmsProdText.split("\n").filter(l => l.includes("http")).slice(0, 3));
+  assert(llmsProdText.includes("https://www.aifounderstalk.com/"), "llms.txt uses canonical HTTPS URLs");
+  assert(!llmsProdText.includes("http://www.aifounderstalk.com"), "llms.txt contains no HTTP aifounderstalk URLs");
 
   // Reset
   delete process.env.NEXT_PUBLIC_SITE_URL;
-  console.log("\nAll URL simulations verified successfully.");
+  env.NODE_ENV = "test";
+  console.log("\nAll automated SEO verification assertions passed successfully! ✨");
 }
 
-run().catch(err => {
+run().catch((err) => {
   console.error(err);
   process.exit(1);
 });
+

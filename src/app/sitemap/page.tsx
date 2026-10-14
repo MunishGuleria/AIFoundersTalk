@@ -7,8 +7,14 @@ import { absoluteUrl } from "@/lib/siteUrl";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "HTML Sitemap | AI Founders Talk",
+  title: "HTML Sitemap",
   description: "Complete index of all articles, founder talks, resource guides, and topic categories on AI Founders Talk.",
+  openGraph: {
+    type: "website",
+    title: "HTML Sitemap | AI Founders Talk",
+    description: "Complete index of all articles, founder talks, resource guides, and topic categories on AI Founders Talk.",
+    url: absoluteUrl("/sitemap"),
+  },
   alternates: {
     canonical: absoluteUrl("/sitemap"),
   },

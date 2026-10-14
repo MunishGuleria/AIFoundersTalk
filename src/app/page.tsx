@@ -1,12 +1,21 @@
 // ISR Revalidation: 1 hour for aggregation & listing pages
 export const revalidate = 3600;
 
+import dynamic from "next/dynamic";
 import { getAllContentMixed, getTrendingItems } from "@/lib/content";
 import { ArticleCard } from "@/components/ArticleCard";
-import { TrendingStartupsPanel } from "@/components/TrendingStartupsPanel";
-import { NewsletterStrip } from "@/components/NewsletterForm";
 import { PILLARS, PillarKey } from "@/lib/taxonomy";
 import Link from "next/link";
+
+const TrendingStartupsPanel = dynamic(
+  () => import("@/components/TrendingStartupsPanel").then((mod) => mod.TrendingStartupsPanel),
+  { ssr: true }
+);
+
+const NewsletterStrip = dynamic(
+  () => import("@/components/NewsletterForm").then((mod) => mod.NewsletterStrip),
+  { ssr: true }
+);
 
 export default async function HomePage() {
   const featured = getAllContentMixed({ featured: true, limit: 1 });
