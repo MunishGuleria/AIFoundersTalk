@@ -16,11 +16,30 @@ export function renderWelcomeEmail({
   unsubscribeUrl: string;
 } {
   const token = generateUnsubscribeToken(email);
-  const siteUrl = absoluteUrl("/");
-  const articlesUrl = absoluteUrl("/articles");
-  const unsubscribeUrl = absoluteUrl(
-    `/api/newsletter/unsubscribe?token=${encodeURIComponent(token)}`
-  );
+  const isLocalDev =
+    isTestMode ||
+    process.env.NODE_ENV !== "production" ||
+    Boolean(
+      process.env.NEXT_PUBLIC_SITE_URL &&
+        /localhost|127\.0\.0\.1/i.test(process.env.NEXT_PUBLIC_SITE_URL)
+    );
+
+  const localBase =
+    process.env.NEXT_PUBLIC_SITE_URL &&
+    /localhost|127\.0\.0\.1/i.test(process.env.NEXT_PUBLIC_SITE_URL)
+      ? process.env.NEXT_PUBLIC_SITE_URL.replace(/\/+$/, "")
+      : "http://localhost:3000";
+
+  const baseOrigin =
+    isLocalDev && process.env.NODE_ENV !== "production"
+      ? localBase
+      : absoluteUrl("/");
+
+  const siteUrl = baseOrigin;
+  const articlesUrl = isLocalDev && process.env.NODE_ENV !== "production"
+    ? `${baseOrigin}/articles`
+    : absoluteUrl("/articles");
+  const unsubscribeUrl = `${baseOrigin}/api/newsletter/unsubscribe?token=${encodeURIComponent(token)}`;
 
   const subject = isTestMode
     ? "[TEST] Welcome to AI Founders Talk"

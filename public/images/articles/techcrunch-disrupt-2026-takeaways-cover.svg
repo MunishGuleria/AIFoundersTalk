@@ -1,0 +1,110 @@
+<svg width="1200" height="675" viewBox="0 0 1200 675" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B0F19" />
+      <stop offset="50%" stop-color="#111827" />
+      <stop offset="100%" stop-color="#0F242A" />
+    </linearGradient>
+
+    <radialGradient id="tealGlow" cx="25%" cy="30%" r="35%">
+      <stop offset="0%" stop-color="#14B8A6" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#14B8A6" stop-opacity="0" />
+    </radialGradient>
+
+    <radialGradient id="amberGlow" cx="75%" cy="60%" r="35%">
+      <stop offset="0%" stop-color="#F59E0B" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#F59E0B" stop-opacity="0" />
+    </radialGradient>
+
+    <linearGradient id="panelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1F2937" stop-opacity="0.85" />
+      <stop offset="100%" stop-color="#111827" stop-opacity="0.85" />
+    </linearGradient>
+
+    <pattern id="grid2" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M 48 0 L 0 0 0 48" fill="none" stroke="#374151" stroke-width="0.75" stroke-opacity="0.25" />
+    </pattern>
+  </defs>
+
+  <!-- Background Base & Glows -->
+  <rect width="1200" height="675" fill="url(#bgGrad2)" />
+  <rect width="1200" height="675" fill="url(#grid2)" />
+  <rect width="1200" height="675" fill="url(#tealGlow)" />
+  <rect width="1200" height="675" fill="url(#amberGlow)" />
+
+  <!-- Conference Schedule Board / Agenda Flow -->
+  <!-- Track 1: Agent Reliability Card -->
+  <g transform="translate(100, 210)">
+    <rect width="300" height="150" rx="12" fill="url(#panelGrad)" stroke="#14B8A6" stroke-width="1.5" stroke-opacity="0.5" />
+    <circle cx="28" cy="28" r="10" fill="#0D9488" fill-opacity="0.3" stroke="#14B8A6" stroke-width="1" />
+    <text x="24" y="32" fill="#14B8A6" font-family="system-ui, sans-serif" font-size="11" font-weight="700">1</text>
+    <text x="48" y="32" fill="#5EEAD4" font-family="system-ui, sans-serif" font-size="11" font-weight="700" letter-spacing="1">EVALUATION</text>
+    <text x="20" y="65" fill="#F9FAFB" font-family="system-ui, sans-serif" font-size="15" font-weight="600">Agent Reliability</text>
+    <text x="20" y="88" fill="#9CA3AF" font-family="system-ui, sans-serif" font-size="12">Testing beyond flashy demos:</text>
+    <text x="20" y="106" fill="#9CA3AF" font-family="system-ui, sans-serif" font-size="12">failure modes, uncertainty &amp; tasks</text>
+    <rect x="20" y="120" width="85" height="16" rx="4" fill="#134E4A" />
+    <text x="26" y="132" fill="#5EEAD4" font-family="system-ui, sans-serif" font-size="9" font-weight="600">TASK ACCURACY</text>
+  </g>
+
+  <!-- Track 2: Agent Security Card -->
+  <g transform="translate(450, 210)">
+    <rect width="300" height="150" rx="12" fill="url(#panelGrad)" stroke="#F59E0B" stroke-width="1.5" stroke-opacity="0.5" />
+    <circle cx="28" cy="28" r="10" fill="#B45309" fill-opacity="0.3" stroke="#F59E0B" stroke-width="1" />
+    <text x="24" y="32" fill="#F59E0B" font-family="system-ui, sans-serif" font-size="11" font-weight="700">2</text>
+    <text x="48" y="32" fill="#FCD34D" font-family="system-ui, sans-serif" font-size="11" font-weight="700" letter-spacing="1">ARCHITECTURE</text>
+    <text x="20" y="65" fill="#F9FAFB" font-family="system-ui, sans-serif" font-size="15" font-weight="600">Security &amp; Permissions</text>
+    <text x="20" y="88" fill="#9CA3AF" font-family="system-ui, sans-serif" font-size="12">Access control as product design:</text>
+    <text x="20" y="106" fill="#9CA3AF" font-family="system-ui, sans-serif" font-size="12">data boundaries &amp; action logging</text>
+    <rect x="20" y="120" width="88" height="16" rx="4" fill="#78350F" />
+    <text x="26" y="132" fill="#FCD34D" font-family="system-ui, sans-serif" font-size="9" font-weight="600">AUTH &amp; GOVERN</text>
+  </g>
+
+  <!-- Track 3: Business Model / GTM Card -->
+  <g transform="translate(800, 210)">
+    <rect width="300" height="150" rx="12" fill="url(#panelGrad)" stroke="#6366F1" stroke-width="1.5" stroke-opacity="0.5" />
+    <circle cx="28" cy="28" r="10" fill="#4338CA" fill-opacity="0.3" stroke="#6366F1" stroke-width="1" />
+    <text x="24" y="32" fill="#818CF8" font-family="system-ui, sans-serif" font-size="11" font-weight="700">3</text>
+    <text x="48" y="32" fill="#A5B4FC" font-family="system-ui, sans-serif" font-size="11" font-weight="700" letter-spacing="1">GTM &amp; SAAS</text>
+    <text x="20" y="65" fill="#F9FAFB" font-family="system-ui, sans-serif" font-size="15" font-weight="600">Rewriting Software Value</text>
+    <text x="20" y="88" fill="#9CA3AF" font-family="system-ui, sans-serif" font-size="12">Shifting from seat pricing to</text>
+    <text x="20" y="106" fill="#9CA3AF" font-family="system-ui, sans-serif" font-size="12">measurable customer outcomes</text>
+    <rect x="20" y="120" width="80" height="16" rx="4" fill="#312E81" />
+    <text x="26" y="132" fill="#A5B4FC" font-family="system-ui, sans-serif" font-size="9" font-weight="600">VALUE METRICS</text>
+  </g>
+
+  <!-- Lower Flow: Hardware & Founder Strategy -->
+  <g transform="translate(275, 400)">
+    <rect width="300" height="140" rx="12" fill="url(#panelGrad)" stroke="#38BDF8" stroke-width="1.5" stroke-opacity="0.5" />
+    <circle cx="28" cy="28" r="10" fill="#0369A1" fill-opacity="0.3" stroke="#38BDF8" stroke-width="1" />
+    <text x="24" y="32" fill="#38BDF8" font-family="system-ui, sans-serif" font-size="11" font-weight="700">4</text>
+    <text x="48" y="32" fill="#7DD3FC" font-family="system-ui, sans-serif" font-size="11" font-weight="700" letter-spacing="1">INFRASTRUCTURE</text>
+    <text x="20" y="65" fill="#F9FAFB" font-family="system-ui, sans-serif" font-size="15" font-weight="600">Beyond the Chatbot</text>
+    <text x="20" y="88" fill="#9CA3AF" font-family="system-ui, sans-serif" font-size="12">Physical AI, edge inference,</text>
+    <text x="20" y="106" fill="#9CA3AF" font-family="system-ui, sans-serif" font-size="12">robotics and compute constraints</text>
+  </g>
+
+  <g transform="translate(625, 400)">
+    <rect width="300" height="140" rx="12" fill="url(#panelGrad)" stroke="#10B981" stroke-width="1.5" stroke-opacity="0.5" />
+    <circle cx="28" cy="28" r="10" fill="#047857" fill-opacity="0.3" stroke="#10B981" stroke-width="1" />
+    <text x="24" y="32" fill="#10B981" font-family="system-ui, sans-serif" font-size="11" font-weight="700">5</text>
+    <text x="48" y="32" fill="#6EE7B7" font-family="system-ui, sans-serif" font-size="11" font-weight="700" letter-spacing="1">EXECUTION</text>
+    <text x="20" y="65" fill="#F9FAFB" font-family="system-ui, sans-serif" font-size="15" font-weight="600">Product Decisions</text>
+    <text x="20" y="88" fill="#9CA3AF" font-family="system-ui, sans-serif" font-size="12">Turning conference themes</text>
+    <text x="20" y="106" fill="#9CA3AF" font-family="system-ui, sans-serif" font-size="12">into engineering roadmaps</text>
+  </g>
+
+  <!-- Connective Agenda Lines -->
+  <path d="M 250 360 L 425 400" stroke="#374151" stroke-width="2" stroke-dasharray="4 4" />
+  <path d="M 600 360 L 775 400" stroke="#374151" stroke-width="2" stroke-dasharray="4 4" />
+
+  <!-- Header Section -->
+  <g transform="translate(100, 80)">
+    <rect width="180" height="26" rx="13" fill="#1F2937" stroke="#4B5563" stroke-width="1" />
+    <text x="16" y="17" fill="#14B8A6" font-family="system-ui, sans-serif" font-size="11" font-weight="700" letter-spacing="1.5">CONFERENCE RECAP</text>
+    <text x="0" y="58" fill="#F9FAFB" font-family="system-ui, sans-serif" font-size="28" font-weight="700">TechCrunch Disrupt 2026</text>
+    <text x="0" y="84" fill="#9CA3AF" font-family="system-ui, sans-serif" font-size="14">Five Signals for AI Founders: Agents, Security, SaaS &amp; Infrastructure</text>
+  </g>
+
+  <!-- Footer -->
+  <text x="100" y="615" fill="#6B7280" font-family="system-ui, sans-serif" font-size="12">Published Agenda &amp; Event-Day Analysis • San Francisco, October 13–15, 2026</text>
+</svg>

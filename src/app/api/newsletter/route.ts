@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
-import { Resend } from "resend";
 import { Redis } from "@upstash/redis";
 import { renderWelcomeEmail } from "@/lib/newsletterEmail";
+import { sendMail, isSmtpConfigured, getDefaultFromAddress } from "@/lib/email";
 
 // Initialize Upstash Redis client for safety limit counters if configured
 const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
@@ -25,17 +25,6 @@ const redis = isRedisConfigured
 // Application-level safety limits
 const MAX_NEW_CONTACTS_PER_DAY = 100;
 const MAX_NEW_CONTACTS_PER_MONTH = 2000;
-
-// Initialize Resend client if configured
-const resendApiKey = process.env.RESEND_API_KEY;
-const isResendConfigured = Boolean(
-  resendApiKey &&
-  !resendApiKey.includes("your-resend-api-key") &&
-  !resendApiKey.includes("your_resend") &&
-  !resendApiKey.includes("placeholder")
-);
-
-const resend = isResendConfigured ? new Resend(resendApiKey) : null;
 
 export async function POST(request: NextRequest) {
   try {
@@ -68,9 +57,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 3. Verify that the newsletter service is configured
-    if (!resend) {
-      console.warn("[newsletter] Subscription attempt rejected: RESEND_API_KEY is not configured.");
+    // 3. Verify that the SMTP email service is configured
+    if (!isSmtpConfigured()) {
+      console.warn("[newsletter] Subscription attempt rejected: SMTP credentials are not configured.");
       return NextResponse.json(
         { error: "Newsletter service is currently unavailable. Please try again later." },
         { status: 503 }
@@ -120,58 +109,43 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 6. Contact management via Resend Contacts API (stores the submitted subscriber email)
-    let isNewContact = false;
-    let shouldSendWelcome = false;
+    // 6. Contact subscription & duplicate handling
+    let isNewContact = true;
+    let shouldSendWelcome = true;
 
-    // Create the contact under the actual subscriber's email
-    const { data: createData, error: createError } = await resend.contacts.create({
-      email: normalizedEmail,
-      unsubscribed: false,
-    });
+    if (redis) {
+      try {
+        const [isSubscribed, isUnsubscribed] = await Promise.all([
+          redis.sismember("newsletter:subscribers", normalizedEmail),
+          redis.sismember("newsletter:unsubscribed", normalizedEmail),
+        ]);
 
-    if (createError) {
-      const errorMessage = (createError.message || "").toLowerCase();
-      const isDuplicate =
-        errorMessage.includes("already exists") ||
-        errorMessage.includes("already added") ||
-        errorMessage.includes("duplicate");
-
-      if (isDuplicate) {
-        isNewContact = false;
-        try {
-          const contactInfo = await resend.contacts.get({ email: normalizedEmail });
-          if (contactInfo.data && contactInfo.data.unsubscribed) {
-            // Re-subscribe the contact
-            await resend.contacts.update({
-              email: normalizedEmail,
-              unsubscribed: false,
-            });
-            shouldSendWelcome = true;
-          } else {
-            // Already actively subscribed - do not duplicate welcome email
-            shouldSendWelcome = false;
-          }
-        } catch {
-          await resend.contacts.update({
-            email: normalizedEmail,
-            unsubscribed: false,
-          });
+        if (isUnsubscribed) {
+          // Re-subscribing: remove from unsubscribed set, add back to subscribers
+          await Promise.all([
+            redis.srem("newsletter:unsubscribed", normalizedEmail),
+            redis.sadd("newsletter:subscribers", normalizedEmail),
+          ]);
+          isNewContact = false;
+          shouldSendWelcome = true;
+        } else if (isSubscribed) {
+          // Already actively subscribed - do not duplicate welcome email
+          isNewContact = false;
           shouldSendWelcome = false;
+        } else {
+          // Brand new contact
+          await redis.sadd("newsletter:subscribers", normalizedEmail);
+          isNewContact = true;
+          shouldSendWelcome = true;
         }
-      } else {
-        console.error(
-          "[newsletter] Resend Contacts API error:",
-          createError.message || "Unknown error"
+      } catch (redisSubError) {
+        console.warn(
+          "[newsletter] Redis subscriber check failed open:",
+          redisSubError instanceof Error ? redisSubError.message : "Unknown error"
         );
-        return NextResponse.json(
-          { error: "Subscription service temporarily unavailable. Please try again later." },
-          { status: 500 }
-        );
+        isNewContact = true;
+        shouldSendWelcome = true;
       }
-    } else if (createData) {
-      isNewContact = true;
-      shouldSendWelcome = true;
     }
 
     // 7. Increment safety limit counters ONLY on successful NEW contacts
@@ -198,59 +172,54 @@ export async function POST(request: NextRequest) {
 
     // 8. Dispatch Welcome Email (if newly subscribed or re-subscribed)
     if (shouldSendWelcome) {
-      try {
-        const fromAddress =
-          process.env.NEWSLETTER_FROM_EMAIL?.trim() ||
-          "AI Founders Talk <onboarding@resend.dev>";
+      const fromAddress = getDefaultFromAddress();
 
-        // Target delivery email: in test mode, override delivery to test recipient while token uses subscriber email
-        const deliveryTo = (isTestMode && testRecipient) ? testRecipient : normalizedEmail;
+      // Target delivery email: in test mode, override delivery to test recipient while token uses subscriber email
+      const deliveryTo = (isTestMode && testRecipient) ? testRecipient : normalizedEmail;
 
-        const { subject, html, text, unsubscribeUrl } = renderWelcomeEmail({
-          email: normalizedEmail,
-          isTestMode,
-        });
+      const { subject, html, text, unsubscribeUrl } = renderWelcomeEmail({
+        email: normalizedEmail,
+        isTestMode,
+      });
 
-        // Hourly idempotency key prevents accidental duplicate sends from fast retries
-        const hourBucket = Math.floor(Date.now() / (1000 * 60 * 60));
-        const idempotencyKey = crypto
-          .createHash("sha256")
-          .update(`welcome:${normalizedEmail}:${deliveryTo}:${hourBucket}`)
-          .digest("hex");
+      // Hourly idempotency key prevents accidental duplicate sends from fast retries
+      const hourBucket = Math.floor(Date.now() / (1000 * 60 * 60));
+      const idempotencyKey = crypto
+        .createHash("sha256")
+        .update(`welcome:${normalizedEmail}:${deliveryTo}:${hourBucket}`)
+        .digest("hex");
 
-        const sendResult = await resend.emails.send({
-          from: fromAddress,
-          to: deliveryTo,
-          subject,
-          html,
-          text,
-          headers: {
-            "X-Entity-Ref-ID": idempotencyKey,
-            "List-Unsubscribe": `<${unsubscribeUrl}>`,
-            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
-          },
-        });
+      const sendResult = await sendMail({
+        from: fromAddress,
+        to: deliveryTo,
+        subject,
+        html,
+        text,
+        headers: {
+          "X-Entity-Ref-ID": idempotencyKey,
+          "List-Unsubscribe": `<${unsubscribeUrl}>`,
+          "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+        },
+      });
 
-        if (sendResult.error) {
-          console.error(
-            "[newsletter] Welcome email send error:",
-            sendResult.error.message || "Unknown error"
-          );
-        } else {
-          console.log(
-            `[newsletter] Welcome email sent successfully (to: ${deliveryTo}, subscriber: ${normalizedEmail}, testMode: ${isTestMode})`
-          );
-        }
-      } catch (emailSendErr) {
+      if (!sendResult.success) {
         console.error(
-          "[newsletter] Welcome email dispatch error:",
-          emailSendErr instanceof Error ? emailSendErr.message : "Unknown error"
+          "[newsletter] Welcome email send error:",
+          sendResult.error || "Unknown error"
+        );
+        return NextResponse.json(
+          { error: "Failed to dispatch welcome email. Please try again later." },
+          { status: 500 }
         );
       }
+
+      console.log(
+        `[newsletter] Welcome email sent successfully via SMTP (testMode: ${isTestMode})`
+      );
     }
 
     console.log(
-      `[newsletter] Subscription completed for ${normalizedEmail} (source: ${source || "direct"}, isNewContact: ${isNewContact}, welcomeSent: ${shouldSendWelcome})`
+      `[newsletter] Subscription completed (source: ${source || "direct"}, isNewContact: ${isNewContact}, welcomeSent: ${shouldSendWelcome})`
     );
 
     return NextResponse.json({

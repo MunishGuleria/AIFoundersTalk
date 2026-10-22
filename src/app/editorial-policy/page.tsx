@@ -80,7 +80,7 @@ export default function EditorialPolicyPage() {
           <ul>
             <li>The content is amended with an explicit update timestamp.</li>
             <li>A correction notice is appended explaining the nature of the change when a factual inaccuracy altered the core argument.</li>
-            <li>Corrections may be submitted to <a href="mailto:editorial@aifounderstalk.com" className="text-blue-600 hover:text-blue-800 underline">editorial@aifounderstalk.com</a>.</li>
+            <li>Corrections may be submitted to <a href="mailto:aifounderstalk@gmail.com" className="text-blue-600 hover:text-blue-800 underline">aifounderstalk@gmail.com</a>.</li>
           </ul>
 
           <h2>Commercial Disclosures</h2>

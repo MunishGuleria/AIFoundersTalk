@@ -5,7 +5,7 @@ export const revalidate = 86400;
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { getContentBySlug, getAllSlugs, getRelatedContent } from "@/lib/content";
+import { getContentBySlug, getAllSlugs, getRelatedContent, getUnlinkedCitations } from "@/lib/content";
 import { getAuthor } from "@/lib/authors";
 import { generateArticleMetadata } from "@/lib/metadata";
 import { ArticleJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
@@ -87,6 +87,7 @@ export default async function ResourcePage({
   const pillar = getPillar(meta.pillar);
 
   const related = getRelatedContent(meta, 4);
+  const unlinkedCitations = getUnlinkedCitations(meta.citations, content);
 
   return (
     <>
@@ -165,13 +166,13 @@ export default async function ResourcePage({
               {meta.updatedAt && meta.updatedAt !== meta.publishedAt && (
                 <>
                   <span>•</span>
-                  <span className="text-slate-700">
+                  <time dateTime={meta.updatedAt} className="text-slate-700">
                     Updated {new Date(meta.updatedAt).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
                       year: "numeric",
                     })}
-                  </span>
+                  </time>
                 </>
               )}
               <span>•</span>
@@ -254,7 +255,14 @@ export default async function ResourcePage({
                 AEORankingFactors,
                 h2: (props: React.HTMLAttributes<HTMLHeadingElement>) => {
                   const id = getHeadingId(props.children);
-                  return <h2 id={id} className="scroll-mt-24" {...props} />;
+                  const isSources = id.includes("source") || id.includes("reference");
+                  return (
+                    <h2
+                      id={id}
+                      className={`scroll-mt-24 ${isSources ? "sources-heading" : ""}`}
+                      {...props}
+                    />
+                  );
                 },
                 h3: (props: React.HTMLAttributes<HTMLHeadingElement>) => {
                   const id = getHeadingId(props.children);
@@ -274,19 +282,19 @@ export default async function ResourcePage({
           </div>
 
           {/* Citations */}
-          {meta.citations && meta.citations.length > 0 && (
+          {unlinkedCitations.length > 0 && (
             <div className="mt-12 pt-8 border-t border-slate-200">
               <h3 className="text-xs font-bold uppercase tracking-widest mb-4 text-slate-900 font-sans">
                 Sources &amp; Industry References
               </h3>
               <ul className="space-y-2.5 font-sans list-none p-0 m-0">
-                {meta.citations.map((cite, i) => (
+                {unlinkedCitations.map((cite, i) => (
                   <li key={i} className="text-xs sm:text-sm">
                     <a
                       href={cite.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-800 underline font-medium transition-colors"
+                      className="source-citation-link"
                       data-track="outbound_resource_click"
                     >
                       {cite.title} →

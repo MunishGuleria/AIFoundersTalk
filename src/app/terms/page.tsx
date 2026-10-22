@@ -80,7 +80,7 @@ export default function TermsPage() {
 
           <h2>6. Contact</h2>
           <p>
-            For syndication requests, licensing inquiries, or legal notices, contact <a href="mailto:editorial@aifounderstalk.com" className="text-blue-600 hover:text-blue-800 underline">editorial@aifounderstalk.com</a>.
+            For syndication requests, licensing inquiries, or legal notices, contact <a href="mailto:aifounderstalk@gmail.com" className="text-blue-600 hover:text-blue-800 underline">aifounderstalk@gmail.com</a>.
           </p>
         </div>
       </div>

@@ -349,3 +349,52 @@ export function getAllSlugs(
     .filter((f) => f.endsWith(".mdx"))
     .map((f) => f.replace(/\.mdx$/, ""));
 }
+
+/**
+ * Normalizes a URL for comparison by stripping protocol, www, trailing slashes, and lowercasing.
+ */
+export function normalizeCitationUrl(url: string): string {
+  try {
+    const parsed = new URL(url);
+    let host = parsed.hostname.toLowerCase();
+    if (host.startsWith("www.")) {
+      host = host.slice(4);
+    }
+    let pathname = parsed.pathname.toLowerCase();
+    while (pathname.endsWith("/") && pathname.length > 1) {
+      pathname = pathname.slice(0, -1);
+    }
+    if (pathname === "/") {
+      pathname = "";
+    }
+    return host + pathname;
+  } catch {
+    let clean = url.trim().toLowerCase();
+    if (clean.startsWith("https://")) clean = clean.slice(8);
+    else if (clean.startsWith("http://")) clean = clean.slice(7);
+    if (clean.startsWith("www.")) clean = clean.slice(4);
+    while (clean.endsWith("/") && clean.length > 0) clean = clean.slice(0, -1);
+    return clean;
+  }
+}
+
+/**
+ * Returns only citations that are not already linked inline within the MDX content.
+ * Prevents repeating citations in a redundant bottom list when they are already cited beside claims.
+ */
+export function getUnlinkedCitations(
+  citations: Citation[] | undefined,
+  content: string
+): Citation[] {
+  if (!citations || citations.length === 0) return [];
+  const inlineUrls = new Set<string>();
+
+  const matches = content.match(/https?:\/\/[^\s\)"'<>]+/g);
+  if (matches) {
+    for (const u of matches) {
+      inlineUrls.add(normalizeCitationUrl(u));
+    }
+  }
+
+  return citations.filter((cite) => !inlineUrls.has(normalizeCitationUrl(cite.url)));
+}

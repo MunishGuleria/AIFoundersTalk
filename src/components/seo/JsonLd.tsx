@@ -75,11 +75,13 @@ export function ArticleJsonLd({
   const isOrgAuthor =
     !authorName ||
     authorName.toLowerCase().includes("editorial") ||
-    authorName.toLowerCase().includes("team");
+    authorName.toLowerCase().includes("team") ||
+    authorName.toLowerCase().includes("ai founders talk");
 
   const authorObj = isOrgAuthor
     ? {
         "@type": "Organization",
+        "@id": getOrganizationId(),
         name: authorName || "AI Founders Talk Editorial",
         url: absoluteUrl("/about"),
       }
@@ -106,6 +108,7 @@ export function ArticleJsonLd({
       url: absoluteUrl("/"),
       logo: {
         "@type": "ImageObject",
+        "@id": absoluteUrl("/icon.svg#logo"),
         url: absoluteUrl("/icon.svg"),
       },
     },
@@ -181,9 +184,17 @@ export function BreadcrumbJsonLd({
 }: {
   items: { name: string; url: string }[];
 }) {
+  const currentItem = items[items.length - 1];
+  const canonicalPageUrl = currentItem
+    ? currentItem.url.startsWith("http")
+      ? currentItem.url
+      : absoluteUrl(currentItem.url)
+    : undefined;
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
+    ...(canonicalPageUrl && { "@id": `${canonicalPageUrl}#breadcrumb` }),
     itemListElement: items.map((item, index) => ({
       "@type": "ListItem",
       position: index + 1,

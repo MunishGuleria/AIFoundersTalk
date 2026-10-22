@@ -86,8 +86,8 @@ export default function AboutPage() {
           <h2>Get in Touch</h2>
           <p>
             Have a question, a founder story to share, or a topic you&apos;d like us to cover? We&apos;d love to hear from you at{" "}
-            <a href="mailto:editorial@aifounderstalk.com" className="text-blue-600 hover:text-blue-800 underline font-medium">
-              editorial@aifounderstalk.com
+            <a href="mailto:aifounderstalk@gmail.com" className="text-blue-600 hover:text-blue-800 underline font-medium">
+              aifounderstalk@gmail.com
             </a>.
           </p>
         </div>

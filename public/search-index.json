@@ -1,5 +1,47 @@
 [
   {
+    "title": "AI This Week: Cloud Model Choice, AI in Biotech, and ChatGPT Ads",
+    "slug": "ai-weekly-digest-october-19-22-2026",
+    "pillar": "news-digest",
+    "excerpt": "A practical roundup of developments in AI distribution, biotechnology workflows, conversational advertising and AI governance from October 18–21, 2026.",
+    "tags": [
+      "AI News",
+      "AI Agents",
+      "Enterprise AI",
+      "AI Marketing"
+    ],
+    "type": "article",
+    "publishedAt": "2026-10-22"
+  },
+  {
+    "title": "TechCrunch Disrupt 2026: Five Signals AI Founders Should Take Away",
+    "slug": "techcrunch-disrupt-2026-ai-founder-takeaways",
+    "pillar": "seminar-recaps",
+    "excerpt": "A practical recap of the AI, startup-building, agent evaluation and infrastructure themes highlighted in the published program and event-day coverage of TechCrunch Disrupt 2026.",
+    "tags": [
+      "TechCrunch Disrupt",
+      "AI Agents",
+      "AI Startups",
+      "AI Security"
+    ],
+    "type": "article",
+    "publishedAt": "2026-10-22"
+  },
+  {
+    "title": "AI Is Making Startup Teams Leaner. What Happens to Junior Talent?",
+    "slug": "ai-startup-teams-junior-talent-founder-perspectives",
+    "pillar": "founder-interviews",
+    "excerpt": "Perspectives from Replit, Workday, Zoho and Indian AI startups reveal the tension between productivity, job displacement and the next generation of talent.",
+    "tags": [
+      "ai-workforce",
+      "startup-hiring",
+      "agentic-ai",
+      "junior-talent"
+    ],
+    "type": "interview",
+    "publishedAt": "2026-10-22"
+  },
+  {
     "title": "The Invisible Workforce: Why Future Startups May Have More Agents Than Employees",
     "slug": "the-invisible-workforce-future-startups-more-agents-than-employees",
     "pillar": "problems-solutions",
@@ -162,7 +204,7 @@
     "publishedAt": "2026-08-25"
   },
   {
-    "title": "Building a Sales Intelligence Platform Inside Microsoft Teams ? Practitioner Architecture & Workflow Lessons",
+    "title": "Building a Sales Intelligence Platform Inside Microsoft Teams — Practitioner Architecture & Workflow Lessons",
     "slug": "sales-intelligence-microsoft-teams-interview",
     "pillar": "founder-interviews",
     "excerpt": "An architectural deep-dive into how enterprise RevOps teams embed competitive intelligence and CRM workflows directly inside Microsoft Teams to eliminate tool-switching friction and elevate seller adoption.",

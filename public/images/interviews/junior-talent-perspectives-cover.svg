@@ -1,0 +1,191 @@
+<svg width="1200" height="675" viewBox="0 0 1200 675" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090D16" />
+      <stop offset="50%" stop-color="#0F172A" />
+      <stop offset="100%" stop-color="#1E293B" />
+    </linearGradient>
+
+    <!-- Radial Glows -->
+    <radialGradient id="cyanGlow" cx="25%" cy="45%" r="40%">
+      <stop offset="0%" stop-color="#0284C7" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#0284C7" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="amberGlow" cx="50%" cy="40%" r="35%">
+      <stop offset="0%" stop-color="#D97706" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#D97706" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="emeraldGlow" cx="78%" cy="50%" r="40%">
+      <stop offset="0%" stop-color="#059669" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#059669" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Linear Gradients for Shapes -->
+    <linearGradient id="aiStream" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#2563EB" />
+    </linearGradient>
+    <linearGradient id="judgmentPrism" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B" />
+      <stop offset="50%" stop-color="#F43F5E" />
+      <stop offset="100%" stop-color="#8B5CF6" />
+    </linearGradient>
+    <linearGradient id="skillSteps" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="100%" stop-color="#06B6D4" />
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E293B" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#0F172A" stop-opacity="0.9" />
+    </linearGradient>
+
+    <!-- Grid Pattern -->
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#334155" stroke-width="1" stroke-opacity="0.2" />
+    </pattern>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="1200" height="675" fill="url(#bgGrad)" />
+  <rect width="1200" height="675" fill="url(#grid)" />
+
+  <!-- Ambient Glows -->
+  <rect width="1200" height="675" fill="url(#cyanGlow)" />
+  <rect width="1200" height="675" fill="url(#amberGlow)" />
+  <rect width="1200" height="675" fill="url(#emeraldGlow)" />
+
+  <!-- Connecting Horizon Guideline -->
+  <line x1="80" y1="520" x2="1120" y2="520" stroke="#334155" stroke-width="1.5" stroke-dasharray="4 6" stroke-opacity="0.6" />
+
+  <!-- ========================================== -->
+  <!-- ZONE 1: AI-ASSISTED AUTOMATION PIPELINES (LEFT) -->
+  <!-- ========================================== -->
+  <g id="zone-ai-pipelines" transform="translate(100, 160)">
+    <!-- Section Label -->
+    <rect x="0" y="0" width="160" height="28" rx="6" fill="#0369A1" fill-opacity="0.2" stroke="#0284C7" stroke-width="1" />
+    <circle cx="16" cy="14" r="4" fill="#38BDF8" />
+    <text x="28" y="19" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="11" font-weight="700" fill="#7DD3FC" letter-spacing="1">AUTOMATED EXECUTION</text>
+
+    <!-- Pipeline Node 1: Fast Triaging / Repetitive Tasks -->
+    <rect x="0" y="50" width="220" height="64" rx="10" fill="url(#cardGrad)" stroke="#0284C7" stroke-width="1.2" stroke-opacity="0.7" />
+    <rect x="16" y="66" width="32" height="32" rx="6" fill="#0284C7" fill-opacity="0.25" />
+    <path d="M26 82 L32 76 L38 82 M32 76 L32 90" stroke="#38BDF8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="60" y="78" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="13" font-weight="600" fill="#F8FAFC">Task Triaging &amp; Ops</text>
+    <text x="60" y="96" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="11" fill="#94A3B8">High-volume automated queues</text>
+
+    <!-- Pipeline Connector -->
+    <path d="M220 82 L260 82 L260 160 L290 160" fill="none" stroke="#38BDF8" stroke-width="2" stroke-linecap="round" stroke-dasharray="6 4" />
+    <circle cx="290" cy="160" r="4" fill="#38BDF8" />
+
+    <!-- Pipeline Node 2: Agentic Code & Workflow Drafting -->
+    <rect x="0" y="130" width="220" height="64" rx="10" fill="url(#cardGrad)" stroke="#2563EB" stroke-width="1.2" stroke-opacity="0.7" />
+    <rect x="16" y="146" width="32" height="32" rx="6" fill="#2563EB" fill-opacity="0.25" />
+    <path d="M24 162 L30 156 L24 150 M34 166 L40 166" stroke="#60A5FA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="60" y="158" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="13" font-weight="600" fill="#F8FAFC">AI-Generated Code</text>
+    <text x="60" y="176" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="11" fill="#94A3B8">Rapid output acceleration</text>
+
+    <!-- Pipeline Connector 2 -->
+    <path d="M220 162 L290 162" fill="none" stroke="#60A5FA" stroke-width="2" stroke-linecap="round" />
+
+    <!-- Pipeline Node 3: Routine Audits & Processing -->
+    <rect x="0" y="210" width="220" height="64" rx="10" fill="url(#cardGrad)" stroke="#4F46E5" stroke-width="1.2" stroke-opacity="0.7" />
+    <rect x="16" y="226" width="32" height="32" rx="6" fill="#4F46E5" fill-opacity="0.25" />
+    <circle cx="32" cy="242" r="8" stroke="#818CF8" stroke-width="2" />
+    <path d="M30 242 L34 246 L42 236" stroke="#818CF8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="60" y="238" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="13" font-weight="600" fill="#F8FAFC">Displaced Routine Flows</text>
+    <text x="60" y="256" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="11" fill="#94A3B8">Automating repetitive steps</text>
+
+    <!-- Pipeline Connector 3 -->
+    <path d="M220 242 L260 242 L260 164 L290 164" fill="none" stroke="#818CF8" stroke-width="2" stroke-linecap="round" stroke-dasharray="6 4" />
+  </g>
+
+  <!-- ========================================== -->
+  <!-- ZONE 2: HUMAN JUDGMENT & TASTE NEXUS (CENTER) -->
+  <!-- ========================================== -->
+  <g id="zone-human-judgment" transform="translate(510, 160)">
+    <!-- Section Label -->
+    <rect x="25" y="0" width="150" height="28" rx="6" fill="#B45309" fill-opacity="0.25" stroke="#F59E0B" stroke-width="1" />
+    <circle cx="42" cy="14" r="4" fill="#FBBF24" />
+    <text x="54" y="19" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="11" font-weight="700" fill="#FDE68A" letter-spacing="1">HUMAN JUDGMENT</text>
+
+    <!-- Radiant Outer Focus Rings -->
+    <circle cx="100" cy="165" r="105" fill="none" stroke="#F59E0B" stroke-width="1" stroke-opacity="0.25" stroke-dasharray="4 8" />
+    <circle cx="100" cy="165" r="85" fill="none" stroke="#F43F5E" stroke-width="1.2" stroke-opacity="0.4" />
+    <circle cx="100" cy="165" r="65" fill="#1E293B" stroke="url(#judgmentPrism)" stroke-width="2.5" />
+
+    <!-- Central Diamond Prism / Lens -->
+    <polygon points="100,120 140,165 100,210 60,165" fill="url(#judgmentPrism)" fill-opacity="0.2" stroke="#F59E0B" stroke-width="2" />
+    
+    <!-- Balance / Discernment Iconography inside Prism -->
+    <circle cx="100" cy="165" r="14" fill="#0F172A" stroke="#FBBF24" stroke-width="2" />
+    <line x1="84" y1="165" x2="116" y2="165" stroke="#FBBF24" stroke-width="2.5" stroke-linecap="round" />
+    <line x1="100" y1="150" x2="100" y2="180" stroke="#FBBF24" stroke-width="2" stroke-linecap="round" />
+    <circle cx="100" cy="165" r="4" fill="#F59E0B" />
+
+    <!-- Review & Taste Quality Callout Below -->
+    <rect x="-10" y="280" width="220" height="48" rx="8" fill="#0F172A" stroke="#F59E0B" stroke-width="1" stroke-opacity="0.6" />
+    <text x="100" y="300" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="12" font-weight="700" fill="#FEF3C7">Consequential Decisions</text>
+    <text x="100" y="316" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="10" fill="#FDE68A">Taste, review &amp; ownership</text>
+
+    <!-- Outgoing Arcs from Judgment to Skill Growth -->
+    <path d="M165 165 C220 165, 220 130, 270 130" fill="none" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round" />
+    <path d="M165 165 C220 165, 230 220, 270 220" fill="none" stroke="#10B981" stroke-width="2" stroke-dasharray="4 4" stroke-linecap="round" />
+  </g>
+
+  <!-- ========================================== -->
+  <!-- ZONE 3: SKILL DEVELOPMENT & ARCHITECT PATH (RIGHT) -->
+  <!-- ========================================== -->
+  <g id="zone-skill-pathway" transform="translate(830, 160)">
+    <!-- Section Label -->
+    <rect x="0" y="0" width="170" height="28" rx="6" fill="#065F46" fill-opacity="0.25" stroke="#10B981" stroke-width="1" />
+    <circle cx="16" cy="14" r="4" fill="#34D399" />
+    <text x="28" y="19" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="11" font-weight="700" fill="#A7F3D0" letter-spacing="1">TALENT PROGRESSION</text>
+
+    <!-- Ascending Steps / Foundation Blocks -->
+    <!-- Step 1: Entry Level Foundation -->
+    <rect x="0" y="240" width="110" height="50" rx="8" fill="url(#cardGrad)" stroke="#10B981" stroke-width="1.5" />
+    <text x="16" y="260" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="11" font-weight="700" fill="#6EE7B7">1. Bounded Tasks</text>
+    <text x="16" y="276" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="10" fill="#94A3B8">Testing &amp; debug</text>
+
+    <!-- Step 2: System Understanding -->
+    <rect x="70" y="170" width="120" height="54" rx="8" fill="url(#cardGrad)" stroke="#10B981" stroke-width="1.5" />
+    <text x="86" y="192" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="11" font-weight="700" fill="#6EE7B7">2. Code Review</text>
+    <text x="86" y="208" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="10" fill="#94A3B8">Verifying behavior</text>
+
+    <!-- Step 3: Architecture & Senior Mastery -->
+    <rect x="150" y="90" width="130" height="60" rx="8" fill="url(#cardGrad)" stroke="#06B6D4" stroke-width="2" />
+    <text x="166" y="114" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="12" font-weight="800" fill="#38BDF8">3. System Architect</text>
+    <text x="166" y="132" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="10" fill="#E2E8F0">Expert judgment</text>
+
+    <!-- Ascending Arrow connecting steps -->
+    <path d="M55 240 L120 170 L210 90" fill="none" stroke="url(#skillSteps)" stroke-width="2.5" stroke-linecap="round" />
+    <polygon points="212,85 218,97 205,94" fill="#38BDF8" />
+
+    <!-- Mentorship / Deliberate Learning Feedback Loop -->
+    <path d="M215 150 C260 210, 190 320, 55 310" fill="none" stroke="#34D399" stroke-width="1.5" stroke-dasharray="5 5" stroke-linecap="round" />
+    <rect x="10" y="325" width="240" height="40" rx="6" fill="#064E3B" fill-opacity="0.3" stroke="#059669" stroke-width="1" />
+    <text x="130" y="348" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="11" font-weight="600" fill="#A7F3D0">Deliberate Learning &amp; Mentorship</text>
+  </g>
+
+  <!-- ========================================== -->
+  <!-- HEADER & FOOTER EDITORIAL BRANDING -->
+  <!-- ========================================== -->
+  <!-- Header Branding Bar -->
+  <g id="header-branding" transform="translate(80, 50)">
+    <text x="0" y="24" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="12" font-weight="800" fill="#94A3B8" letter-spacing="2">AI FOUNDERS TALK</text>
+    <text x="155" y="24" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="12" font-weight="400" fill="#475569">|</text>
+    <text x="170" y="24" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="12" font-weight="700" fill="#F59E0B" letter-spacing="1.5">FOUNDER PERSPECTIVES ROUNDUP</text>
+    <text x="0" y="52" font-family="Georgia, Cambria, 'Times New Roman', serif" font-size="22" font-weight="700" fill="#FFFFFF">Lean Startup Teams &amp; The Junior Talent Pipeline</text>
+  </g>
+
+  <!-- Footer Meta & Provenance Tag -->
+  <g id="footer-meta" transform="translate(80, 605)">
+    <!-- Dimension & Quality Indicators -->
+    <rect x="0" y="0" width="310" height="28" rx="6" fill="#1E293B" fill-opacity="0.6" stroke="#334155" stroke-width="1" />
+    <text x="14" y="18" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="11" font-weight="600" fill="#94A3B8">Replit · Workday · Zoho · Indian AI Startups</text>
+
+    <!-- Original Graphic Provenance Notice -->
+    <text x="1040" y="18" text-anchor="end" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" font-size="11" font-weight="600" fill="#64748B">Original Graphic by AI Founders Talk</text>
+  </g>
+</svg>

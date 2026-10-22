@@ -165,10 +165,10 @@ export default function NotFound() {
         <p className="m-0">
           Looking for a specific investigation or need assistance? Contact our editorial team at{" "}
           <a
-            href="mailto:editorial@aifounderstalk.com"
+            href="mailto:aifounderstalk@gmail.com"
             className="text-slate-800 font-semibold underline hover:text-slate-950"
           >
-            editorial@aifounderstalk.com
+            aifounderstalk@gmail.com
           </a>.
         </p>
       </footer>

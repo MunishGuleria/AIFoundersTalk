@@ -55,7 +55,7 @@ export default async function ResourcesPage({ searchParams }: ResourcesPageProps
           className="text-2xl sm:text-3xl font-bold mb-3"
           style={{ fontFamily: "var(--font-serif)" }}
         >
-          Practical Resources for Founders &amp; Operators
+          Resources for Founders &amp; Operators
         </h1>
         <p className="text-sm sm:text-base mb-8 max-w-2xl text-gray-600">
           Tool comparisons, frameworks, checklists, and guides for designing,

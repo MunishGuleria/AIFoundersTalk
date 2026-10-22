@@ -130,15 +130,27 @@ a:hover {
   color: var(--foreground);
 }
 
-.prose a {
+.prose a,
+.source-citation-link {
   color: #2563EB;
   text-decoration: underline;
+  text-decoration-thickness: 1.5px;
   text-underline-offset: 3px;
   font-weight: 500;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
 }
 
-.prose a:hover {
+.prose a:hover,
+.source-citation-link:hover {
   color: #1D4ED8;
+  text-decoration-color: #1D4ED8;
+}
+
+.prose a:focus-visible,
+.source-citation-link:focus-visible {
+  outline: 2px solid #2563EB;
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
 .prose h2 {
@@ -532,4 +544,94 @@ input[type="search"]::-webkit-search-results-decoration {
   width: 100%;
   height: auto;
   display: block;
+}
+
+/* ============================================================
+   Sources & Further Reading / References Styling
+   Reduces font size of sources across all articles
+   ============================================================ */
+.prose h2#sources-further-reading,
+.prose h2#sources-industry-references,
+.prose h2#sources,
+.prose h2#references,
+.prose h2[id*="source"],
+.prose .sources-heading {
+  font-size: 0.8125rem !important; /* 13px */
+  line-height: 1.25rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  color: #475569 !important; /* slate-600 */
+  margin-top: 2.5rem !important;
+  margin-bottom: 0.75rem !important;
+  padding-bottom: 0.5rem !important;
+  border-bottom: 1px solid var(--border) !important;
+  font-family: var(--font-sans) !important;
+}
+
+.prose h2#sources-further-reading + ul,
+.prose h2#sources-industry-references + ul,
+.prose h2#sources + ul,
+.prose h2#references + ul,
+.prose h2[id*="source"] + ul,
+.prose .sources-heading + ul,
+.prose h2#sources-further-reading + ol,
+.prose h2#sources-industry-references + ol,
+.prose h2#sources + ol,
+.prose h2[id*="source"] + ol,
+.prose .sources-heading + ol {
+  font-size: 0.8125rem !important; /* 13px */
+  line-height: 1.6 !important;
+  color: #475569 !important;
+  margin-top: 0.5rem !important;
+  margin-bottom: 1.25rem !important;
+  padding-left: 1.25rem !important;
+}
+
+.prose h2#sources-further-reading + ul li,
+.prose h2#sources-industry-references + ul li,
+.prose h2#sources + ul li,
+.prose h2#references + ul li,
+.prose h2[id*="source"] + ul li,
+.prose .sources-heading + ul li,
+.prose h2#sources-further-reading + ol li,
+.prose h2#sources-industry-references + ol li,
+.prose h2#sources + ol li,
+.prose h2[id*="source"] + ol li,
+.prose .sources-heading + ol li {
+  font-size: 0.8125rem !important; /* 13px */
+  line-height: 1.6 !important;
+  margin-bottom: 0.375rem !important;
+  color: #475569 !important;
+}
+
+.prose h2#sources-further-reading + ul li a,
+.prose h2#sources-industry-references + ul li a,
+.prose h2#sources + ul li a,
+.prose h2#references + ul li a,
+.prose h2[id*="source"] + ul li a,
+.prose .sources-heading + ul li a,
+.prose h2#sources-further-reading + ol li a,
+.prose h2#sources-industry-references + ol li a,
+.prose h2#sources + ol li a,
+.prose h2[id*="source"] + ol li a,
+.prose .sources-heading + ol li a {
+  font-size: 0.8125rem !important; /* 13px */
+  font-weight: 500 !important;
+}
+
+.source-citation-link {
+  font-size: 0.8125rem !important; /* 13px */
+  line-height: 1.5 !important;
+}
+
+.prose h2#sources-further-reading + ul + p,
+.prose h2#sources-further-reading + ul + hr + p,
+.prose h2[id*="source"] + ul + p,
+.prose h2[id*="source"] + ul + hr + p,
+.prose .sources-heading + ul + p,
+.prose .sources-heading + ul + hr + p {
+  font-size: 0.75rem !important; /* 12px */
+  line-height: 1.5 !important;
+  color: #64748B !important; /* slate-500 */
 }

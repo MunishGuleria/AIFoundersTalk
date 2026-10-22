@@ -28,10 +28,10 @@ export function Footer() {
                 Editorial Inquiries
               </span>
               <a
-                href="mailto:editorial@aifounderstalk.com"
+                href="mailto:aifounderstalk@gmail.com"
                 className="text-xs text-neutral-300 hover:text-white underline underline-offset-2 break-all sm:break-normal transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white rounded"
               >
-                editorial@aifounderstalk.com
+                aifounderstalk@gmail.com
               </a>
             </div>
           </div>

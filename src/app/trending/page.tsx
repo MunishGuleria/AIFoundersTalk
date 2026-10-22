@@ -89,8 +89,8 @@ export default async function TrendingPage(props: TrendingPageProps) {
   return (
     <>
       <WebPageJsonLd
-        title="AI & Startup Trending | AI Founders Talk"
-        description="Live tracking of AI and startup discussions across the developer ecosystem."
+        title="Trending — Top Discussions & Founder Topics | AI Founders Talk"
+        description="Live tracking of top artificial intelligence, startup, and tooling discussions across Hacker News and the developer ecosystem."
         url="/trending"
         type="CollectionPage"
       />

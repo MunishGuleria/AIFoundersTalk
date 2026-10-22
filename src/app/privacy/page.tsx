@@ -73,7 +73,7 @@ export default function PrivacyPage() {
 
           <h2>5. Your Rights &amp; Choices</h2>
           <p>
-            You may unsubscribe from our newsletter at any time by clicking the &ldquo;unsubscribe&rdquo; link in any email footer. To request deletion of your subscription record or inquire about your data, contact us at <a href="mailto:editorial@aifounderstalk.com" className="text-blue-600 hover:text-blue-800 underline">editorial@aifounderstalk.com</a>.
+            You may unsubscribe from our newsletter at any time by clicking the &ldquo;unsubscribe&rdquo; link in any email footer. To request deletion of your subscription record or inquire about your data, contact us at <a href="mailto:aifounderstalk@gmail.com" className="text-blue-600 hover:text-blue-800 underline">aifounderstalk@gmail.com</a>.
           </p>
 
           <h2>6. Updates to This Policy</h2>
