@@ -35,6 +35,7 @@ export interface ContentMeta {
   publishedAt: string;
   updatedAt?: string;
   excerpt: string;
+  takeaway?: string;
   coverImage?: string;
   coverImageAlt?: string;
   coverImageSource?: ImageSourceType;
@@ -118,6 +119,7 @@ export function getContentBySlug(
     publishedAt: data.publishedAt || new Date().toISOString().split("T")[0],
     updatedAt: data.updatedAt,
     excerpt: data.excerpt || "",
+    takeaway: data.takeaway || data.executiveTakeaway,
     coverImage: data.coverImage,
     coverImageAlt: data.coverImageAlt,
     coverImageSource: data.coverImageSource,

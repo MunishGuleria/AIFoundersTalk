@@ -265,13 +265,13 @@ export default async function ArticlePage({
           )}
 
           {/* Answer-First / Key Takeaway Section */}
-          {meta.excerpt && (
+          {(meta.takeaway || meta.excerpt) && (
             <div className="my-8 p-5 sm:p-6 bg-slate-50 border-l-4 border-slate-900 rounded-r-xl border-y border-r border-slate-200">
               <span className="text-[11px] font-bold uppercase tracking-widest text-slate-900 block mb-2 font-sans">
                 Executive Takeaway
               </span>
               <p className="text-base sm:text-lg text-slate-800 font-serif leading-relaxed m-0">
-                {meta.excerpt}
+                {meta.takeaway || meta.excerpt}
               </p>
             </div>
           )}
