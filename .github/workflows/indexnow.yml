@@ -1,0 +1,81 @@
+name: IndexNow Production Deployment Notifier
+
+on:
+  repository_dispatch:
+    types:
+      - vercel.deployment.success
+      - vercel.deployment.promoted
+  workflow_dispatch:
+    inputs:
+      commit_sha:
+        description: "Target production commit SHA (defaults to latest deployed commit)"
+        required: false
+      previous_sha:
+        description: "Previous commit SHA (defaults to INDEXNOW_LAST_SUBMITTED_SHA variable)"
+        required: false
+      dry_run:
+        description: "Dry-run mode (validates changes and masks payload without sending real API requests)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: indexnow
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  indexnow:
+    name: Notify IndexNow
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve Target Deployment SHA
+        id: resolve
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          GIT_SHA: ${{ github.event.client_payload.git.sha }}
+          META_SHA: ${{ github.event.client_payload.deployment.meta.githubCommitSha }}
+          INPUT_SHA: ${{ inputs.commit_sha }}
+          DEFAULT_SHA: ${{ github.sha }}
+        run: |
+          TARGET_SHA="${GIT_SHA:-${META_SHA:-${INPUT_SHA}}}"
+          if [ -z "$TARGET_SHA" ] && [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            TARGET_SHA="$DEFAULT_SHA"
+          fi
+          if [ -z "$TARGET_SHA" ]; then
+            echo "::error::Target deployment commit SHA is missing from event payload."
+            exit 1
+          fi
+          if ! [[ "$TARGET_SHA" =~ ^[0-9a-fA-F]{7,40}$ ]]; then
+            echo "::error::Invalid commit SHA format: $TARGET_SHA"
+            exit 1
+          fi
+          echo "target_sha=$TARGET_SHA" >> "$GITHUB_OUTPUT"
+          echo "Resolved target deployment SHA: $TARGET_SHA"
+
+      - name: Check out repository at deployed commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.resolve.outputs.target_sha }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run IndexNow Submission Dispatcher
+        id: indexnow
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_EVENT_ACTION: ${{ github.event.action }}
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
+          LAST_SUBMITTED_SHA: ${{ vars.INDEXNOW_LAST_SUBMITTED_SHA }}
+          INPUT_COMMIT_SHA: ${{ steps.resolve.outputs.target_sha }}
+          INPUT_PREVIOUS_SHA: ${{ inputs.previous_sha }}
+          INDEXNOW_GH_TOKEN: ${{ secrets.INDEXNOW_GH_TOKEN }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          node scripts/indexnow-submit.mjs

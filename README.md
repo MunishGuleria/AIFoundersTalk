@@ -192,7 +192,59 @@ npm run build
 
 ---
 
-## 7. Git Workflow
+## 7. IndexNow Search Engine Automation
+
+AI Founders Talk integrates with the official [IndexNow protocol](https://www.indexnow.org/) to instantly notify participating search engines (Microsoft Bing, Yandex, Seznam, Naver) whenever editorial content or application routes change on production deployments.
+
+### How It Works
+
+1. **Vercel Deployment Trigger**: Successful production deployments emit a `repository_dispatch` event (`vercel.deployment.success` / `vercel.deployment.promoted`) to GitHub Actions.
+2. **Strict Production Filtering**: The workflow verifies that the deployment target is `production`, belongs to `ai-founders-talk`, and was built from the `main` branch. Non-production and preview deployments are cleanly skipped.
+3. **Change Detection & URL Mapping**: The workflow computes the Git diff against the previous successfully deployed commit (`INDEXNOW_LAST_SUBMITTED_SHA`). Added, modified, deleted, and renamed MDX articles/interviews/resources as well as affected static application routes are mapped to canonical HTTPS URLs (`https://www.aifounderstalk.com/...`).
+4. **Official Protocol Submission**: Changed URLs are submitted in batches of up to 10,000 via JSON POST to `https://api.indexnow.org/indexnow` using the site's permanent root verification key.
+5. **Durable Idempotency & Retries**: The processed commit cursor is stored in the GitHub repository variable `INDEXNOW_LAST_SUBMITTED_SHA`. It advances only after IndexNow acknowledges receipt (HTTP 200 or HTTP 202). HTTP 202 indicates that the submission was accepted while key verification is pending asynchronously; it is never logged or treated as confirmed indexing. Temporary rate limits (HTTP 429) and server errors (HTTP 5xx) retry automatically with bounded exponential backoff.
+
+### Verification Key
+
+- **Verification Key File**: `public/98691b408f39471596f62b575f744a90.txt`
+- **Public Verification URL**: `https://www.aifounderstalk.com/98691b408f39471596f62b575f744a90.txt`
+- The key is permanent and must not be rotated on routine builds.
+
+### Testing Commands
+
+```bash
+# Run automated IndexNow test suite (35 assertions, dry-run only, zero real API calls)
+npm run test:indexnow
+
+# Detect changed URLs between commits or for specific files
+node scripts/indexnow-detect-changes.mjs --files "content/articles/what-is-aeo-ai-answer-engine-optimization.mdx,src/app/about/page.tsx"
+
+# Run submission dispatcher in dry-run mode
+node scripts/indexnow-submit.mjs --dry-run --sha HEAD --since HEAD~1
+```
+
+### One-Time Manual Setup (Post-Implementation)
+
+Complete the following one-time configuration steps:
+
+1. **Verify Key Deployment**: After deploying, confirm that `https://www.aifounderstalk.com/98691b408f39471596f62b575f744a90.txt` returns HTTP 200 with the exact 32-character key.
+2. **Vercel GitHub Integration (Repository Dispatch)**: Ensure the GitHub repository (`MunishGuleria/AIFoundersTalk`) is connected to the Vercel project (`ai-founders-talk`). When linked via the official Vercel for GitHub integration, Vercel automatically dispatches repository events (`vercel.deployment.success` and `vercel.deployment.promoted`) to GitHub Actions upon production deployment completion. *(Note: There is no separate "Deployment Events" toggle in Vercel settings; the GitHub repository connection itself enables these dispatches).*
+3. **Configure GitHub Repository Variable**: In GitHub repository Settings → **Secrets and variables** → **Actions** → **Variables** tab:
+   - Create variable: `INDEXNOW_LAST_SUBMITTED_SHA`
+   - Set value to the currently deployed production commit SHA (e.g. `c00a781d4a899a7b0559eb95df4a7eb06e890c2a`).
+   - *Note: If left empty, the first automated run will safely initialize the baseline cursor to the latest deployment commit without bulk-submitting historical URLs.*
+4. **Configure GitHub Actions Secret (`INDEXNOW_GH_TOKEN`)**: In GitHub repository Settings → **Secrets and variables** → **Actions** → **Secrets** tab:
+   - Secret Name: `INDEXNOW_GH_TOKEN`
+   - Token Type: GitHub fine-grained Personal Access Token (PAT) or GitHub App installation token.
+   - Resource Owner / Repository Access: Restricted strictly to `MunishGuleria/AIFoundersTalk`.
+   - Permissions: Repository permissions → **Variables: Read and write** (minimum required permission to update repository variables via the GitHub REST API).
+   - *Important: Do not create or configure this token until you have reviewed the implementation.*
+5. **Execute a Controlled Test**: Go to GitHub Actions → **IndexNow Production Deployment Notifier** → click **Run workflow**, check `dry_run: true`, and inspect the output logs to confirm changed URLs are detected, the key is masked, and the cursor update logic is verified.
+6. **Verify in Bing Webmaster Tools**: In [Bing Webmaster Tools](https://www.bing.com/webmasters) under **IndexNow**, verify that recent submissions and key validation status appear. *(Note: IndexNow acceptance confirms receipt, not instant indexing).*
+
+---
+
+## 8. Git Workflow
 
 1. Make changes locally in Git.
 2. Run `npm run lint` and `npm run build` to verify code quality and route generation.
@@ -202,7 +254,7 @@ npm run build
 
 ---
 
-## 8. Current V1 Architecture vs. Deferred Roadmap
+## 9. Current V1 Architecture vs. Deferred Roadmap
 
 - **No Relational Database**: All content is stored in Git-tracked MDX. SQL database integration (Neon Postgres) is deferred.
 - **No RSS/Gemini Ingestion Pipeline**: Ingestion and automated AI synthesis pipelines are excluded in V1.

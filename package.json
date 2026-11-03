@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint .",
     "prebuild": "node scripts/build-search-index.mjs",
-    "predev": "node scripts/build-search-index.mjs"
+    "predev": "node scripts/build-search-index.mjs",
+    "test:indexnow": "node scripts/test-indexnow.mjs",
+    "indexnow:detect": "node scripts/indexnow-detect-changes.mjs"
   },
   "dependencies": {
     "@upstash/ratelimit": "^2.0.8",
